@@ -4,7 +4,8 @@ import os
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 
-from .db import get_session
+from shared.db import get_session
+
 from .handlers import save_reading
 
 load_dotenv()

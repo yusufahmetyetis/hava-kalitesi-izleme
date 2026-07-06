@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
-from .models import FilteredReading, ProcessedReading, RawReading, Station
+from shared.models import FilteredReading, ProcessedReading, RawReading, Station
 
 ALGO_VERSION = "v1"
 FILTER_ALGO_VERSION = "zscore_v1"

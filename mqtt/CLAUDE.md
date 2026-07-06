@@ -6,14 +6,13 @@ Bu klasörde çalışırken kök CLAUDE.md kuralları da geçerli (özellikle: o
 - `publisher.py`: WAQI'den İstanbul istasyon verisini çekip MQTT'ye yayınlar (mevcut mantık korunur,
   sadece token `.env`'den okunacak şekilde değişir).
 - `subscriber/`: MQTT'den gelen mesajı SQLAlchemy ile DB'ye yazar. Tek dosya değil, modüler:
-  - `db.py` → engine + session factory (her mesajda yeni connection AÇMA, session'ı yeniden kullan
-    veya pool'dan al)
-  - `models.py` → `Station`, `RawReading`, `ProcessedReading`, `FilteredReading` ORM sınıfları
-    (mevcut SQL şemasıyla birebir uyumlu: pg_setup.py'deki tablolarla aynı alan adları)
   - `handlers.py` → mesaj payload'ını alıp DB'ye yazan fonksiyon(lar); ileride "algoritma" buraya
     kolayca eklenebilecek şekilde ayrılmalı (ham kayıt yazma ile işlenmiş kayıt yazma net ayrı adımlar
     olsun, aralarına sonradan bir "process()" adımı sokulabilsin)
   - `consumer.py` → mqtt client kurulumu, on_connect/on_message, ana döngü
+- engine/session (`db.py`) ve ORM modelleri (`models.py`) artık burada değil, kök seviyede
+  `shared/` paketinde (backend ile paylaşılıyor, bkz. kök `CLAUDE.md`). `handlers.py` ve
+  `consumer.py` bunları `from shared.db import ...` / `from shared.models import ...` ile alır.
 
 ## Kısıtlar
 - Mevcut `category()` fonksiyonu (AQI eşikleri) ve JSON payload yapısı değişmeyecek, sadece taşınacak.

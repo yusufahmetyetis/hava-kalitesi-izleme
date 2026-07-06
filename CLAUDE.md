@@ -15,19 +15,20 @@ MQTT (WAQI verisi) → PostgreSQL (SQLAlchemy) → FastAPI (BFF) → Web Dashboa
 
 ## Mimari (hedef klasör yapısı)
 ```
+shared/                # mqtt ve backend arasında paylaşılan, kod tekrarı önlemek için
+  db.py                 # SQLAlchemy engine/session (SessionLocal, get_session())
+  models.py              # ORM modelleri (stations, raw_readings, processed_readings, filtered_readings)
 mqtt/
   publisher.py
   subscriber/          # modüler subscriber (tek dosya değil)
     consumer.py         # mqtt bağlantısı, mesaj döngüsü
-    handlers.py          # mesaj -> DB yazma mantığı
-    db.py                # SQLAlchemy engine/session
-    models.py            # ORM modelleri (stations, raw_readings, processed_readings)
+    handlers.py          # mesaj -> DB yazma mantığı (shared/db.py, shared/models.py kullanır)
 backend/
   app/
     main.py
     routers/
     schemas/          # pydantic
-    services/          # DB'den okuma, dashboard'a hazırlama mantığı
+    services/          # DB'den okuma, dashboard'a hazırlama mantığı (shared/models.py kullanır)
 frontend/
   (stage 3'te karar verilecek: basit HTML+JS mi, framework mi)
 docs/
