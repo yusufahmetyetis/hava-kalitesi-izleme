@@ -56,8 +56,26 @@ cur.execute("""
         processed_at TIMESTAMPTZ DEFAULT now()
     );
 
+    CREATE TABLE IF NOT EXISTS filtered_readings (
+        id BIGSERIAL PRIMARY KEY,
+        raw_id BIGINT REFERENCES raw_readings(id),
+        station_id INTEGER,
+        measured_at TIMESTAMPTZ,
+        baseline_mean DOUBLE PRECISION,
+        baseline_std DOUBLE PRECISION,
+        z_score DOUBLE PRECISION,
+        is_anomaly BOOLEAN,
+        is_valid BOOLEAN,
+        validity_notes TEXT,
+        algo_version TEXT,
+        filtered_at TIMESTAMPTZ DEFAULT now()
+    );
+
     CREATE INDEX IF NOT EXISTS idx_raw_station_time
         ON raw_readings (station_id, measured_at);
+
+    CREATE INDEX IF NOT EXISTS idx_filtered_station_time
+        ON filtered_readings (station_id, measured_at);
 """)
 
 con.commit()
