@@ -1,10 +1,16 @@
+import os
+
 import requests
 import json
 import time
 import paho.mqtt.client as mqtt
+from dotenv import load_dotenv
 
-TOKEN = "ccb69fcb6ef495793cfbc9e5aa342cf5d53e5d3e"
-BROKER, PORT = "localhost", 1883
+load_dotenv()
+
+TOKEN = os.getenv("WAQI_TOKEN")
+BROKER = os.getenv("MQTT_BROKER", "localhost")
+PORT = int(os.getenv("MQTT_PORT", "1883"))
 POLL_SECONDS = 300   # 5 dakika
 SEARCH_URL = f"https://api.waqi.info/search/?token={TOKEN}&keyword=istanbul"
 FEED_URL   = "https://api.waqi.info/feed/@{uid}/?token=" + TOKEN
