@@ -124,7 +124,7 @@ def save_raw_reading(session, payload: dict) -> RawReading:
     raw = RawReading(
         station_id=payload["station_id"],
         station_name=payload["station_name"],
-        measured_at=payload.get("measured_at"),
+        measured_at=datetime.fromisoformat(payload["measured_at"]),
         pm25=payload.get("pm25"),
         pm10=payload.get("pm10"),
         o3=payload.get("o3"),
