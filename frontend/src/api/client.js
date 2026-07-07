@@ -11,3 +11,7 @@ async function getJSON(path) {
 export function fetchLatestReadings() {
   return getJSON("/readings/latest");
 }
+
+export function fetchHistory(stationId, range) {
+  return getJSON(`/stations/${stationId}/history?range=${range}`);
+}

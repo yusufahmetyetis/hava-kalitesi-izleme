@@ -46,6 +46,15 @@ class HistoryPointOut(BaseModel):
     category: str | None
     is_anomaly: bool | None
     is_valid: bool | None
+    pm25: float | None
+    pm10: float | None
+    o3: float | None
+    no2: float | None
+    so2: float | None
+    co: float | None
+    temperature: float | None
+    humidity: float | None
+    wind: float | None
 
 
 class AnomalyOut(BaseModel):

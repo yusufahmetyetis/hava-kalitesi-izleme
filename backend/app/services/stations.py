@@ -92,6 +92,15 @@ def get_history(db: Session, station_id: int, range_: str) -> list[HistoryPointO
             category=processed.category,
             is_anomaly=processed.is_anomaly,
             is_valid=filtered.is_valid,
+            pm25=raw.pm25,
+            pm10=raw.pm10,
+            o3=raw.o3,
+            no2=raw.no2,
+            so2=raw.so2,
+            co=raw.co,
+            temperature=raw.temperature,
+            humidity=raw.humidity,
+            wind=raw.wind,
         )
         for raw, processed, filtered in rows
     ]

@@ -13,6 +13,7 @@ body,
 .app-layout {
   display: flex;
   height: 100%;
+  position: relative;
 }
 
 .map-container {

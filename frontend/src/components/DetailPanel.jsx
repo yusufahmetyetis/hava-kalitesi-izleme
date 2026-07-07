@@ -1,35 +1,34 @@
-import { aqiColor } from "../lib/aqi.js";
+import StationSummary from "./StationSummary.jsx";
+import StationRanking from "./StationRanking.jsx";
 
-function formatTime(iso) {
-  if (!iso) return "-";
-  return new Date(iso).toLocaleString("tr-TR");
-}
+// Masaüstü docked panel. reading yoksa AQI sıralama listesi, varsa özet + detay butonu.
+export default function DetailPanel({
+  reading,
+  readings,
+  onSelect,
+  onShowDetail,
+  onClose,
+  collapsed,
+}) {
+  const cls = `detail-panel${collapsed ? " collapsed" : ""}`;
 
-export default function DetailPanel({ reading }) {
   if (!reading) {
     return (
-      <aside className="detail-panel detail-panel--empty">
-        <p>Detay için haritadan bir istasyon seçin.</p>
+      <aside className={cls}>
+        <StationRanking readings={readings} onSelect={onSelect} />
       </aside>
     );
   }
 
-  const category = reading.processed?.category ?? "Bilinmiyor";
-
   return (
-    <aside className="detail-panel">
-      <h2>{reading.station_name ?? `İstasyon ${reading.station_id}`}</h2>
-      <div className="aqi-big" style={{ color: aqiColor(reading.aqi) }}>
-        {reading.aqi ?? "?"}
-        <span className="aqi-unit">AQI</span>
-      </div>
-      <div className="detail-category">{category}</div>
-      <dl className="detail-meta">
-        <dt>Baskın kirletici</dt>
-        <dd>{reading.dominant ?? "-"}</dd>
-        <dt>Ölçüm zamanı</dt>
-        <dd>{formatTime(reading.measured_at)}</dd>
-      </dl>
+    <aside className={cls}>
+      <button className="panel-close" onClick={onClose} aria-label="Kapat">
+        ×
+      </button>
+      <StationSummary reading={reading} />
+      <button className="btn-detail" onClick={onShowDetail}>
+        Detayları Göster
+      </button>
     </aside>
   );
 }
