@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchHistory } from "../api/client.js";
 import AqiTimeSeriesChart from "./AqiTimeSeriesChart.jsx";
-import PollutantRadarChart from "./PollutantRadarChart.jsx";
+import PollutantCards from "./PollutantCards.jsx";
 import DailySummaryCards from "./DailySummaryCards.jsx";
 
 const RANGES = [
@@ -61,7 +61,7 @@ export default function StationDetail({ reading }) {
 
           <section className="chart-block">
             <h3>Kirleticiler</h3>
-            <PollutantRadarChart reading={reading} />
+            <PollutantCards reading={reading} />
           </section>
 
           {range === "7d" && (

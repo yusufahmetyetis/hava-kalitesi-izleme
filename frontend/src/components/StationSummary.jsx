@@ -1,12 +1,13 @@
 import { aqiColor } from "../lib/aqi.js";
 import CategoryDot from "./CategoryDot.jsx";
+import DominantPollutantBox from "./DominantPollutantBox.jsx";
 
 function formatTime(iso) {
   if (!iso) return "-";
   return new Date(iso).toLocaleString("tr-TR");
 }
 
-export default function StationSummary({ reading }) {
+export default function StationSummary({ reading, dominantAsBox = false }) {
   const category = reading.processed?.category ?? "Bilinmiyor";
   return (
     <div className="station-summary">
@@ -19,9 +20,14 @@ export default function StationSummary({ reading }) {
         <CategoryDot aqi={reading.aqi} />
         <span>{category}</span>
       </div>
+      {dominantAsBox && <DominantPollutantBox reading={reading} />}
       <dl className="detail-meta">
-        <dt>Baskın kirletici</dt>
-        <dd>{reading.dominant ?? "-"}</dd>
+        {!dominantAsBox && (
+          <>
+            <dt>Baskın kirletici</dt>
+            <dd>{reading.dominant ?? "-"}</dd>
+          </>
+        )}
         <dt>Ölçüm zamanı</dt>
         <dd>{formatTime(reading.measured_at)}</dd>
       </dl>

@@ -1,9 +1,9 @@
 // Chart.js bileşenlerini bir kez kaydet (tree-shakeable API).
+// Yalnızca çizgi grafiği (zaman serisi) kullanılıyor; radar kaldırıldı.
 import {
   Chart,
   CategoryScale,
   LinearScale,
-  RadialLinearScale,
   PointElement,
   LineElement,
   Filler,
@@ -14,7 +14,6 @@ import {
 Chart.register(
   CategoryScale,
   LinearScale,
-  RadialLinearScale,
   PointElement,
   LineElement,
   Filler,

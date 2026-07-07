@@ -1,7 +1,9 @@
 import StationSummary from "./StationSummary.jsx";
+import WeatherCard from "./WeatherCard.jsx";
 import StationRanking from "./StationRanking.jsx";
 
-// Masaüstü docked panel. reading yoksa AQI sıralama listesi, varsa özet + detay butonu.
+// Masaüstü docked panel. reading yoksa AQI sıralama listesi, varsa özet + hava durumu +
+// alta sabitlenmiş "Detayları Göster" butonu.
 export default function DetailPanel({
   reading,
   readings,
@@ -15,7 +17,9 @@ export default function DetailPanel({
   if (!reading) {
     return (
       <aside className={cls}>
-        <StationRanking readings={readings} onSelect={onSelect} />
+        <div className="panel-scroll">
+          <StationRanking readings={readings} onSelect={onSelect} />
+        </div>
       </aside>
     );
   }
@@ -25,7 +29,10 @@ export default function DetailPanel({
       <button className="panel-close" onClick={onClose} aria-label="Kapat">
         ×
       </button>
-      <StationSummary reading={reading} />
+      <div className="panel-scroll">
+        <StationSummary reading={reading} />
+        <WeatherCard reading={reading} />
+      </div>
       <button className="btn-detail" onClick={onShowDetail}>
         Detayları Göster
       </button>

@@ -1,9 +1,11 @@
-import { MapContainer, TileLayer } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import StationMarker from "./StationMarker.jsx";
 
 // İstanbul merkezli başlangıç görünümü (veriler burada yoğun).
 const ISTANBUL_CENTER = [41.05, 28.95];
 const INITIAL_ZOOM = 11;
+const FLYTO_ZOOM = 13;
 
 // Türkiye geneli pan sınırı (güneyde Akdeniz — kuzeyde Karadeniz kıyısı,
 // batıda Ege — doğu sınırı). Kıyıları biraz taşan makul bir dikdörtgen.
@@ -12,7 +14,18 @@ const TURKEY_BOUNDS = [
   [42.3, 44.8],
 ];
 
-export default function MapView({ readings, onSelect }) {
+// Seçili istasyon değişince haritayı animasyonlu olarak o konuma kaydır.
+function MapFlyTo({ target }) {
+  const map = useMap();
+  useEffect(() => {
+    if (target && target.lat != null && target.lng != null) {
+      map.flyTo([target.lat, target.lng], FLYTO_ZOOM, { duration: 1.2 });
+    }
+  }, [target, map]);
+  return null;
+}
+
+export default function MapView({ readings, onSelect, selected }) {
   return (
     <div className="map-container">
       <MapContainer
@@ -30,6 +43,7 @@ export default function MapView({ readings, onSelect }) {
         {readings.map((r) => (
           <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
         ))}
+        <MapFlyTo target={selected} />
       </MapContainer>
     </div>
   );
