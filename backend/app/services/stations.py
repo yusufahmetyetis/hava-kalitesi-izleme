@@ -1,11 +1,17 @@
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select
+from sqlalchemy import Date, cast, func, select
 from sqlalchemy.orm import Session
 
 from shared.models import FilteredReading, ProcessedReading, RawReading, Station
 
-from ..schemas.reading import FilteredInfo, HistoryPointOut, LatestReadingOut, ProcessedInfo
+from ..schemas.reading import (
+    CalendarDayOut,
+    FilteredInfo,
+    HistoryPointOut,
+    LatestReadingOut,
+    ProcessedInfo,
+)
 from ..schemas.station import StationOut
 
 RANGE_TO_TIMEDELTA = {
@@ -103,4 +109,50 @@ def get_history(db: Session, station_id: int, range_: str) -> list[HistoryPointO
             wind=raw.wind,
         )
         for raw, processed, filtered in rows
+    ]
+
+
+def get_calendar(db: Session, station_id: int) -> list[CalendarDayOut]:
+    # Günü İstanbul yerel gününe göre grupla.
+    day_col = cast(
+        func.timezone("Europe/Istanbul", RawReading.measured_at), Date
+    ).label("day")
+
+    rows = db.execute(
+        select(
+            day_col,
+            func.percentile_cont(0.25).within_group(RawReading.pm25.asc()),
+            func.percentile_cont(0.5).within_group(RawReading.pm25.asc()),
+            func.percentile_cont(0.75).within_group(RawReading.pm25.asc()),
+            func.percentile_cont(0.25).within_group(RawReading.pm10.asc()),
+            func.percentile_cont(0.5).within_group(RawReading.pm10.asc()),
+            func.percentile_cont(0.75).within_group(RawReading.pm10.asc()),
+            func.count().label("reading_count"),
+            func.count()
+            .filter(FilteredReading.is_anomaly.isnot(None))
+            .label("evaluated_count"),
+            func.count()
+            .filter(FilteredReading.is_anomaly.is_(True))
+            .label("anomaly_count"),
+        )
+        .join(FilteredReading, FilteredReading.raw_id == RawReading.id, isouter=True)
+        .where(RawReading.station_id == station_id)
+        .group_by(day_col)
+        .order_by(day_col.asc())
+    ).all()
+
+    return [
+        CalendarDayOut(
+            day=row[0],
+            pm25_q1=row[1],
+            pm25_q2=row[2],
+            pm25_q3=row[3],
+            pm10_q1=row[4],
+            pm10_q2=row[5],
+            pm10_q3=row[6],
+            reading_count=row[7],
+            evaluated_count=row[8],
+            anomaly_count=row[9],
+        )
+        for row in rows
     ]

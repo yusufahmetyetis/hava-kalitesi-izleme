@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel
 
@@ -68,3 +68,16 @@ class AnomalyOut(BaseModel):
     is_valid: bool | None
     validity_notes: str | None
     algo_version: str | None
+
+
+class CalendarDayOut(BaseModel):
+    day: date
+    pm25_q1: float | None
+    pm25_q2: float | None
+    pm25_q3: float | None
+    pm10_q1: float | None
+    pm10_q2: float | None
+    pm10_q3: float | None
+    reading_count: int
+    evaluated_count: int
+    anomaly_count: int

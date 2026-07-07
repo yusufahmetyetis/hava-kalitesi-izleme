@@ -15,3 +15,7 @@ export function fetchLatestReadings() {
 export function fetchHistory(stationId, range) {
   return getJSON(`/stations/${stationId}/history?range=${range}`);
 }
+
+export function fetchCalendar(stationId) {
+  return getJSON(`/stations/${stationId}/calendar`);
+}

@@ -385,6 +385,72 @@
   color: #888;
 }
 
+/* ---- Takvim heatmap ---- */
+.calendar {
+  position: relative;
+}
+
+.calendar-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cal-btn {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  background: #eef0f4;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cal-btn.active {
+  color: #fff;
+  background: #3366cc;
+  border-color: #3366cc;
+}
+
+.calendar-scroll {
+  overflow-x: auto;
+}
+
+.calendar-year {
+  margin-bottom: 16px;
+}
+
+.calendar-year-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.cal-axis {
+  font-size: 9px;
+  fill: #999;
+}
+
+.cal-edge {
+  stroke: #333;
+  stroke-width: 1;
+}
+
+.calendar-tip {
+  position: absolute;
+  transform: translate(-50%, -120%);
+  background: #222;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
 /* ---- Günlük özet kartları ---- */
 .daily-cards {
   display: grid;
