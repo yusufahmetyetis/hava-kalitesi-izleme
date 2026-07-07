@@ -14,7 +14,16 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [view, setView] = useState("map"); // "map" | "detail"
   const [panelCollapsed, setPanelCollapsed] = useState(false);
+  const [layers, setLayers] = useState({
+    stations: true,
+    heatmap: false,
+    anomalies: false,
+  });
   const [error, setError] = useState(null);
+
+  function toggleLayer(key) {
+    setLayers((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
 
   const isMobile = useMediaQuery("(max-width: 767px)");
 
@@ -44,7 +53,13 @@ export default function App() {
 
   return (
     <div className="app-layout">
-      <MapView readings={readings} onSelect={handleSelect} selected={selected} />
+      <MapView
+        readings={readings}
+        onSelect={handleSelect}
+        selected={selected}
+        layers={layers}
+        onToggleLayer={toggleLayer}
+      />
 
       {!isMobile && (
         <>

@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import StationMarker from "./StationMarker.jsx";
+import HeatLayer from "./HeatLayer.jsx";
+import AnomalyLayer from "./AnomalyLayer.jsx";
+import LayerControl from "./LayerControl.jsx";
 
 // İstanbul merkezli başlangıç görünümü (veriler burada yoğun).
 const ISTANBUL_CENTER = [41.05, 28.95];
@@ -25,7 +28,13 @@ function MapFlyTo({ target }) {
   return null;
 }
 
-export default function MapView({ readings, onSelect, selected }) {
+export default function MapView({
+  readings,
+  onSelect,
+  selected,
+  layers,
+  onToggleLayer,
+}) {
   return (
     <div className="map-container">
       <MapContainer
@@ -40,11 +49,18 @@ export default function MapView({ readings, onSelect, selected }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {readings.map((r) => (
-          <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
-        ))}
+
+        {layers.heatmap && <HeatLayer readings={readings} />}
+        {layers.anomalies && <AnomalyLayer readings={readings} />}
+        {layers.stations &&
+          readings.map((r) => (
+            <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
+          ))}
+
         <MapFlyTo target={selected} />
       </MapContainer>
+
+      <LayerControl layers={layers} onToggle={onToggleLayer} />
     </div>
   );
 }

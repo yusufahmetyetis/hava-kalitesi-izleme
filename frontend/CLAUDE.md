@@ -34,6 +34,23 @@ düzeyinde uygulanır: **sıradakine onaysız geçme.**
 2. Onay gelince `docs/PROGRESS.md`'ye satır ekle, sonra commit at (`stage3X: kısa özet`).
 3. Onaysız sıradaki alt-aşamaya geçme, onaysız commit yok.
 
+## İleride 100+ sensöre ölçeklenirken dikkat edilecekler
+Şu an 21 istasyonla çalışıyoruz; aşağıdakiler henüz KOD olarak uygulanmadı, yalnızca mimari not.
+
+- **Marker render'ı:** 21 DivIcon marker sorunsuz. Yüzlerce marker'da Leaflet'in düz marker
+  yaklaşımı performans (DOM/redraw) sorunu yaratabilir → ileride **Leaflet.markercluster**
+  (kümeleme) değerlendirilecek. Şimdi eklenmiyor.
+- **`/readings/latest`:** şu an tüm istasyonları tek istekte dönüyor; yüzlerce satırda hâlâ
+  kabul edilebilir ama ileride **sayfalama / bölgesel (viewport bbox) filtreleme** gerekebilir.
+  Backend'e şimdilik dokunulmuyor.
+- **Leaflet.heat:** yoğun nokta için tasarlandığından, sensör sayısı arttıkça bu katmanın
+  **görsel kalitesi İYİLEŞİR** — seyrek veride ayrı "haleler", yoğun veride sürekli gradyan.
+  Yani veri büyümesi bu katmanı olumsuz değil, olumlu etkiler.
+- **Anomali katmanı:** yalnızca `filtered.is_anomaly === true` istasyonları vurgular. Erken
+  aşamada baseline yetersizken `NULL`, yeterli veri birikince çoğu okumada `false` olur; katman
+  ancak z-score eşiğini (|z|>2) aşan uç değerlerde dolu görünür. Mevcut veride 0 anomali olması
+  (katmanın boş görünmesi) normaldir — bir hata değil.
+
 ## MVP kapsamı dışı (ileride, proje başkanı onayı sonrası düşünülecek)
 - Rüzgar yönü / rüzgar animasyonu: WAQI feed'inde bu veri yok (İstanbul istasyonları yalnızca
   rüzgar hızı `w` ve gust `wg` besliyor, yön alanı `wd` gelmiyor). Eklemek Open-Meteo gibi ayrı

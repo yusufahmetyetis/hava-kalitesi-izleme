@@ -37,6 +37,12 @@ Bu klasörde çalışırken kök CLAUDE.md kuralları da geçerli (özellikle: o
   `z_score = (aqi - baseline_mean) / baseline_std`, `|z_score| > 2.0` ise `True`.
 - `algo_version` sabit: `"zscore_v1"`.
 
+## Bilinen teknik borç / ileride değerlendirilecek
+- `baseline_std` çok küçükken (örn. <1, istasyon çok istikrarlıyken) z-score aşırı hassas hale
+  geliyor: ufak bir sapma bile devasa z-score üretebiliyor (gerçek veride -43, -31 gibi değerler
+  görüldü). İleride bir minimum std tabanı (floor) eklenmesi değerlendirilebilir — şimdilik
+  dokunulmuyor.
+
 ## Yapma
 - ORM modellerini publisher.py'ye sızdırma; publisher sadece MQTT'ye yayınlar, DB'yi bilmez.
 - Alembic migration ekleme (bu stage'de kapsam dışı, ileride konuşulacak).
