@@ -31,9 +31,12 @@ ISTANBUL_TZ = ZoneInfo("Europe/Istanbul")
 SIM_TO_WAQI: dict[str, int | str | None] = {
     "Istanbul Basaksehir": 8152,
     "Istanbul Esenyurt": 8153,
-    "Istanbul Kagithane": None,  # TODO: iki aday var — 5382 "Istanbul (Kagithane)"
-    #       (41.087733,28.982773) mi, 8154 "Istanbul Kagithane" (41.09233,28.97478) mi?
-    #       SİM istasyonunun gerçek adresini sim.csb.gov.tr'den teyit edip seç.
+    # Kagithane/Uskudar: WAQI listesinde her ikisi için de 2 aday var (aynı ilçede 2 ayrı
+    # fiziksel SİM istasyonu — attribution ikisinde de "Turkey National Air Quality Monitoring
+    # Network", yani ağ kaynağı ayırt etmiyor). Kesin ayraç: WAQI'nin city.url slug'ında "mthm"
+    # geçmesi — Excel'deki dahili istasyon adı da "...-MTHM" son ekiyle bitiyor, birebir eşleşiyor.
+    # 8154 -> .../kagithane/mthm, 8161 -> .../uskudar/mthm (5382/4151'de "mthm" yok).
+    "Istanbul Kagithane": 8154,
     "Istanbul Kandilli": "NEW",  # WAQI listesinde eşleşen istasyon yok.
     "Istanbul Mecidiyekoy": 8156,
     "Istanbul Sile": 8158,
@@ -43,8 +46,7 @@ SIM_TO_WAQI: dict[str, int | str | None] = {
     "Istanbul Sultanbeyli": 11610,
     "Istanbul Sultangazi": 11611,
     "Istanbul Umraniye": 4150,
-    "Istanbul Uskudar": None,  # TODO: iki aday var — 4151 "Istanbul (Uskudar)"
-    #       (41.015278,29.025) mi, 8161 "Istanbul Uskudar" (41.02705,29.02489) mi? Teyit et.
+    "Istanbul Uskudar": 8161,
     "Mobil 2": 14843,  # TODO: SEYYAR istasyon. SİM dosyasındaki konum "Tuzla - Tershaneler",
     #       WAQI'deki "Mobil 2" kaydının konumu farklı olabilir (araç zamanla yer değiştirir).
     #       Bu eşlemenin kabul edilebilir olduğunu teyit et.
