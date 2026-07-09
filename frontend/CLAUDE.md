@@ -51,6 +51,14 @@ düzeyinde uygulanır: **sıradakine onaysız geçme.**
   ancak z-score eşiğini (|z|>2) aşan uç değerlerde dolu görünür. Mevcut veride 0 anomali olması
   (katmanın boş görünmesi) normaldir — bir hata değil.
 
+## Bilinen kısıt: "Mobil 2" istasyonu (station_id=14843)
+- Seyyar (mobil) bir istasyon; `stations` tablosundaki `lat/lng` aracın en son bilinen
+  konumu (sabit değil). SİM backfill'i (`mqtt/backfill_sim.py`) ile yazılan 1 yıllık geçmiş
+  veri, haritada/heatmap'te bu **tek sabit noktada** gösterilecek — gerçekte araç yıl boyunca
+  farklı yerlerde ölçüm yapmış olabilir, bu bilgi kaynak veride yok. Kullanıcı onayıyla kabul
+  edildi, çözülmedi (bkz. `mqtt/backfill_sim.py` `SIM_TO_WAQI["Mobil 2"]` yorumu). Takvim/zaman
+  serisi grafiklerini etkilemez, yalnızca coğrafi görselleştirmeleri (harita, heatmap) ilgilendirir.
+
 ## MVP kapsamı dışı (ileride, proje başkanı onayı sonrası düşünülecek)
 - Rüzgar yönü / rüzgar animasyonu: WAQI feed'inde bu veri yok (İstanbul istasyonları yalnızca
   rüzgar hızı `w` ve gust `wg` besliyor, yön alanı `wd` gelmiyor). Eklemek Open-Meteo gibi ayrı

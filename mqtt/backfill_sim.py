@@ -47,9 +47,13 @@ SIM_TO_WAQI: dict[str, int | str | None] = {
     "Istanbul Sultangazi": 11611,
     "Istanbul Umraniye": 4150,
     "Istanbul Uskudar": 8161,
-    "Mobil 2": 14843,  # TODO: SEYYAR istasyon. SİM dosyasındaki konum "Tuzla - Tershaneler",
-    #       WAQI'deki "Mobil 2" kaydının konumu farklı olabilir (araç zamanla yer değiştirir).
-    #       Bu eşlemenin kabul edilebilir olduğunu teyit et.
+    "Mobil 2": 14843,  # BİLİNEN KISIT (kullanıcı onayıyla kabul edildi, çözülmedi): SEYYAR
+    #       istasyon. SİM dosyasındaki isim "Tuzla - Tershaneler" konumunu gösteriyor ama
+    #       stations tablosundaki 14843 koordinatı (41.05,28.87) farklı bir yerde (muhtemelen
+    #       aracın en son senkronize edilen konumu). 1 yıllık geçmiş veri boyunca araç muhtemelen
+    #       hareket etti; bu bilgi dosyada yok. Sonuç: backfill edilen geçmiş ölçümler haritada/
+    #       heatmap'te TEK SABİT (muhtemelen yanlış) konumda görünür. Takvim/zaman serisi
+    #       grafiklerini etkilemez (konuma bağlı değiller).
 }
 
 # "NEW" işaretli istasyonlara sabit id (900000+). lat/lng bilinmiyor -> NULL
