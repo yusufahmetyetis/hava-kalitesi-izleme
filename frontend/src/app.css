@@ -1,19 +1,26 @@
-/* ---- Masaüstü docked özet paneli ---- */
+/* ---- Masaüstü özet paneli — haritanın üstünde yüzen overlay, harita genişliğini
+   etkilemez (eskiden flex sibling'di, panel aç/kapa haritayı sıkıştırıp akışkanlığı
+   bozuyordu; IQAir tarzı sağdan kayan drawer'a çevrildi). ---- */
 .detail-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
   width: 300px;
-  min-width: 0;
+  height: 100%;
+  z-index: 1200;
   background: #f7f7f9;
   border-left: 1px solid #e0e0e0;
-  position: relative;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: width 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 .detail-panel.collapsed {
-  width: 0;
+  transform: translateX(100%);
   border-left: none;
+  box-shadow: none;
 }
 
 /* Kaydırılabilir içerik alanı; footer buton bunun dışında sabit kalır. */

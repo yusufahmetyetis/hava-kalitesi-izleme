@@ -4,6 +4,11 @@ const LAYERS = [
   { key: "heatmap", label: "Isı haritası (tahmini)" },
   { key: "anomalies", label: "Anomaliler" },
   { key: "districts", label: "İlçe özeti (choropleth)" },
+  {
+    key: "wind",
+    label: "Rüzgar Akışı",
+    info: "10 metre yükseklikte rüzgar yönü ve hızı (Open-Meteo.com)",
+  },
 ];
 
 export default function LayerControl({ layers, onToggle }) {

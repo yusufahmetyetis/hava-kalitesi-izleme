@@ -4,6 +4,7 @@ import StationMarker from "./StationMarker.jsx";
 import HeatLayer from "./HeatLayer.jsx";
 import AnomalyLayer from "./AnomalyLayer.jsx";
 import DistrictLayer from "./DistrictLayer.jsx";
+import WindLayer from "./WindLayer.jsx";
 import LayerControl from "./LayerControl.jsx";
 
 // İstanbul merkezli başlangıç görünümü (veriler burada yoğun).
@@ -60,6 +61,7 @@ export default function MapView({
           readings.map((r) => (
             <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
           ))}
+        {layers.wind && <WindLayer />}
 
         <MapFlyTo target={selected} />
       </MapContainer>
