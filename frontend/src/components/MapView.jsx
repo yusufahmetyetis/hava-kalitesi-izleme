@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import StationMarker from "./StationMarker.jsx";
 import HeatLayer from "./HeatLayer.jsx";
 import AnomalyLayer from "./AnomalyLayer.jsx";
+import DistrictLayer from "./DistrictLayer.jsx";
 import LayerControl from "./LayerControl.jsx";
 
 // İstanbul merkezli başlangıç görünümü (veriler burada yoğun).
@@ -52,6 +53,7 @@ export default function MapView({
           maxZoom={19}
         />
 
+        {layers.districts && <DistrictLayer readings={readings} />}
         {layers.heatmap && <HeatLayer readings={readings} />}
         {layers.anomalies && <AnomalyLayer readings={readings} />}
         {layers.stations &&
@@ -61,6 +63,12 @@ export default function MapView({
 
         <MapFlyTo target={selected} />
       </MapContainer>
+
+      {layers.heatmap && (
+        <div className="heatmap-notice">
+          ⚠ Bu katman interpolasyon tahminidir, ölçüm verisi değildir.
+        </div>
+      )}
 
       <LayerControl layers={layers} onToggle={onToggleLayer} />
     </div>

@@ -1,8 +1,9 @@
 // Haritanın sağ üstünde katman aç/kapa paneli. Üç katman bağımsız.
 const LAYERS = [
   { key: "stations", label: "İstasyonlar" },
-  { key: "heatmap", label: "Isı haritası" },
+  { key: "heatmap", label: "Isı haritası (tahmini)" },
   { key: "anomalies", label: "Anomaliler" },
+  { key: "districts", label: "İlçe özeti (choropleth)" },
 ];
 
 export default function LayerControl({ layers, onToggle }) {

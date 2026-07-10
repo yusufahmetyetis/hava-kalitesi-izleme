@@ -18,6 +18,7 @@ export default function App() {
     stations: true,
     heatmap: false,
     anomalies: false,
+    districts: false,
   });
   const [error, setError] = useState(null);
 
