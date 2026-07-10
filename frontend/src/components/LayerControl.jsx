@@ -4,11 +4,6 @@ const LAYERS = [
   { key: "heatmap", label: "Isı haritası (tahmini)" },
   { key: "anomalies", label: "Anomaliler" },
   { key: "districts", label: "İlçe özeti (choropleth)" },
-  {
-    key: "openMeteo",
-    label: "Model AQI (Open-Meteo)",
-    info: "CAMS modeli tahmini, ~11 km çözünürlük. Ölçüm istasyonu verisi değildir.",
-  },
 ];
 
 export default function LayerControl({ layers, onToggle }) {

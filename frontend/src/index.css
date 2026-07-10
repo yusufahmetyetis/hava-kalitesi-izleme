@@ -69,6 +69,13 @@ body,
   width: 100%;
 }
 
+/* Choropleth ilçe poligonuna tıklayınca tarayıcının çizdiği varsayılan focus
+   dikdörtgenini (bbox) kaldırır — Leaflet interaktif path'lere erişilebilirlik
+   için tabindex ekliyor, tıklama bunu focus'luyor. */
+.leaflet-interactive:focus {
+  outline: none;
+}
+
 /* Isı haritası açıkken gösterilen tahmin uyarısı */
 .heatmap-notice {
   position: absolute;
@@ -83,22 +90,6 @@ body,
   font-size: 12px;
   color: #664d03;
   max-width: 260px;
-}
-
-/* Open-Meteo katmanı açıkken gösterilen atıf */
-.open-meteo-attribution {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  z-index: 1000;
-  background: #fff;
-  border: 1px solid #dcdfe6;
-  border-radius: 6px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
-  padding: 6px 10px;
-  font-size: 11px;
-  color: #555;
-  max-width: 280px;
 }
 
 /* AQI rozet marker (DivIcon) */

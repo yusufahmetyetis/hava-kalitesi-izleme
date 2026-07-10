@@ -285,6 +285,50 @@
   color: #888;
 }
 
+/* ---- Şehir AQI (Open-Meteo) kartı — AQI sıralamasının üstünde ---- */
+.city-aqi-widget {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: #f7f7f9;
+  border: 1px solid #e6e8ec;
+  border-radius: 8px;
+}
+
+.city-aqi-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.city-aqi-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.city-aqi-badge {
+  flex: none;
+  min-width: 44px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.city-aqi-note {
+  font-size: 12px;
+  color: #888;
+}
+
+.city-aqi-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
 /* ---- Ortak detay (grafikler) ---- */
 .station-detail {
   margin-top: 12px;

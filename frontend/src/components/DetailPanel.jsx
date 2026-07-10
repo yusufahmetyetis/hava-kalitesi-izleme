@@ -1,9 +1,11 @@
 import StationSummary from "./StationSummary.jsx";
 import WeatherCard from "./WeatherCard.jsx";
 import StationRanking from "./StationRanking.jsx";
+import CityAqiWidget from "./CityAqiWidget.jsx";
 
-// Masaüstü docked panel. reading yoksa AQI sıralama listesi, varsa özet + hava durumu +
-// alta sabitlenmiş "Detayları Göster" butonu.
+// Masaüstü docked panel. reading yoksa AQI sıralama listesi (üstünde şehir geneli
+// Open-Meteo model AQI kartı), varsa özet + hava durumu + alta sabitlenmiş
+// "Detayları Göster" butonu.
 export default function DetailPanel({
   reading,
   readings,
@@ -18,6 +20,7 @@ export default function DetailPanel({
     return (
       <aside className={cls}>
         <div className="panel-scroll">
+          <CityAqiWidget />
           <StationRanking readings={readings} onSelect={onSelect} />
         </div>
       </aside>

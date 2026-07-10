@@ -19,7 +19,6 @@ export default function App() {
     heatmap: false,
     anomalies: false,
     districts: false,
-    openMeteo: false,
   });
   const [error, setError] = useState(null);
 
