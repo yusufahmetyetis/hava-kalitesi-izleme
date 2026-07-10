@@ -1,9 +1,14 @@
-// Haritanın sağ üstünde katman aç/kapa paneli. Üç katman bağımsız.
+// Haritanın sağ üstünde katman aç/kapa paneli. Katmanlar bağımsız.
 const LAYERS = [
   { key: "stations", label: "İstasyonlar" },
   { key: "heatmap", label: "Isı haritası (tahmini)" },
   { key: "anomalies", label: "Anomaliler" },
   { key: "districts", label: "İlçe özeti (choropleth)" },
+  {
+    key: "openMeteo",
+    label: "Model AQI (Open-Meteo)",
+    info: "CAMS modeli tahmini, ~11 km çözünürlük. Ölçüm istasyonu verisi değildir.",
+  },
 ];
 
 export default function LayerControl({ layers, onToggle }) {
@@ -18,6 +23,11 @@ export default function LayerControl({ layers, onToggle }) {
             onChange={() => onToggle(l.key)}
           />
           <span>{l.label}</span>
+          {l.info && (
+            <span className="layer-info-icon" title={l.info}>
+              ℹ
+            </span>
+          )}
         </label>
       ))}
     </div>

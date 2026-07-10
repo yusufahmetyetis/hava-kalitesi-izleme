@@ -5,6 +5,7 @@ import HeatLayer from "./HeatLayer.jsx";
 import AnomalyLayer from "./AnomalyLayer.jsx";
 import DistrictLayer from "./DistrictLayer.jsx";
 import LayerControl from "./LayerControl.jsx";
+import OpenMeteoLayer from "./OpenMeteoLayer.jsx";
 
 // İstanbul merkezli başlangıç görünümü (veriler burada yoğun).
 const ISTANBUL_CENTER = [41.05, 28.95];
@@ -56,6 +57,7 @@ export default function MapView({
         {layers.districts && <DistrictLayer readings={readings} />}
         {layers.heatmap && <HeatLayer readings={readings} />}
         {layers.anomalies && <AnomalyLayer readings={readings} />}
+        {layers.openMeteo && <OpenMeteoLayer />}
         {layers.stations &&
           readings.map((r) => (
             <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
@@ -67,6 +69,13 @@ export default function MapView({
       {layers.heatmap && (
         <div className="heatmap-notice">
           ⚠ Bu katman interpolasyon tahminidir, ölçüm verisi değildir.
+        </div>
+      )}
+
+      {layers.openMeteo && (
+        <div className="open-meteo-attribution">
+          Hava kalitesi modeli: Open-Meteo.com (CAMS / Copernicus Atmosphere Monitoring
+          Service)
         </div>
       )}
 
