@@ -53,7 +53,7 @@ export default function App() {
 
   return (
     <div className="app-layout">
-      <div className="map-container">
+      <div className={`map-container${activeView === "3d" ? " map-container-sky" : ""}`}>
         {activeView === "3d" ? (
           <DeckGLMap readings={readings} onSelect={handleSelect} />
         ) : (

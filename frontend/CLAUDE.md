@@ -62,4 +62,14 @@ düzeyinde uygulanır: **sıradakine onaysız geçme.**
 ## MVP kapsamı dışı (ileride, proje başkanı onayı sonrası düşünülecek)
 - Rüzgar yönü / rüzgar animasyonu: WAQI feed'inde bu veri yok (İstanbul istasyonları yalnızca
   rüzgar hızı `w` ve gust `wg` besliyor, yön alanı `wd` gelmiyor). Eklemek Open-Meteo gibi ayrı
-  bir kaynak entegrasyonu gerektirir — MVP dışı.
+  bir kaynak entegrasyonu gerektirir — MVP dışı. (Not: sonradan aşama 2a'da Marmara bölgesi için
+  Open-Meteo Wind API ile ayrıca eklendi, bkz. `WindLayer.jsx`.)
+
+## Bilinen kısıt: 3D görünümde terrain dokusu uzaklaşınca bulanıklaşıyor
+- `DeckGLMap.jsx`'teki `TerrainLayer` (deck.gl) belli bir seviyeden fazla uzaklaşılınca uydu
+  dokusunda bulanıklık/aliasing gösteriyor (WebGL texture minification, mipmap uygulanmıyor).
+  Kaynak kodu incelendi: alttaki `SimpleMeshLayer` bir `textureParameters` prop'u destekliyor
+  ama `TerrainLayer` bunu kendi `renderSubLayers()`'ında iletmiyor ve `defaultProps`'unda da
+  yok (`@deck.gl/geo-layers` v9.3.6) — yani dışarıdan mipmap/filtreleme ayarlanamıyor. Bu
+  deck.gl'in kendi API boşluğu, kütüphanenin internal API'sine müdahale etmeden düzeltilemiyor.
+  Kullanıcı onayıyla bilinen sınırlama olarak kabul edildi, çözülmedi.

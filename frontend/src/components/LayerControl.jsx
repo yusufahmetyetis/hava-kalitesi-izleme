@@ -17,6 +17,11 @@ const LAYERS = [
     label: "Hexbin (İstasyon Yoğunluğu)",
     info: "İstasyonları altıgen hücrelerle gruplar. Ortalama AQI gösterilir. Kesikli gösterim — interpolasyon yapılmaz. İlçe özeti ile aynı anda açıksa görsel çakışabilir.",
   },
+  {
+    key: "terrain",
+    label: "Topoğrafya (3D)",
+    info: "İstanbul topoğrafyası — Copernicus DEM GLO-30 © DLR e.V. / Airbus DS, Copernicus/ESA. Terrain tile: AWS Open Data (Mapzen elevation-tiles-prod). Uydu görüntüsü: Esri World Imagery. Yalnızca 3D görünümde etkili.",
+  },
 ];
 
 export default function LayerControl() {

@@ -7,16 +7,15 @@ import DistrictLayer from "./DistrictLayer.jsx";
 import WindLayer from "./WindLayer.jsx";
 import HexbinLayer from "./HexbinLayer.jsx";
 import { useMapStore } from "../store/mapStore.js";
-import { leafletToViewState, viewStateToLeaflet } from "../lib/geoUtils.js";
+import { leafletToViewState, viewStateToLeaflet, TURKEY_BOUNDS } from "../lib/geoUtils.js";
 import { normalizeStation } from "../lib/stationUtils.js";
 
 const FLYTO_ZOOM = 13;
 
-// Türkiye geneli pan sınırı (güneyde Akdeniz — kuzeyde Karadeniz kıyısı,
-// batıda Ege — doğu sınırı). Kıyıları biraz taşan makul bir dikdörtgen.
-const TURKEY_BOUNDS = [
-  [35.8, 25.5],
-  [42.3, 44.8],
+// Leaflet maxBounds formatı: [[south, west], [north, east]].
+const LEAFLET_BOUNDS = [
+  [TURKEY_BOUNDS.minLat, TURKEY_BOUNDS.minLng],
+  [TURKEY_BOUNDS.maxLat, TURKEY_BOUNDS.maxLng],
 ];
 
 // Seçili istasyon değişince haritayı animasyonlu olarak o konuma kaydır.
@@ -57,7 +56,7 @@ export default function MapView({ readings, onSelect, selected }) {
       center={center}
       zoom={zoom}
       minZoom={6}
-      maxBounds={TURKEY_BOUNDS}
+      maxBounds={LEAFLET_BOUNDS}
       maxBoundsViscosity={0.7}
       scrollWheelZoom
     >
