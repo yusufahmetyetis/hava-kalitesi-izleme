@@ -5,8 +5,10 @@ import HeatLayer from "./HeatLayer.jsx";
 import AnomalyLayer from "./AnomalyLayer.jsx";
 import DistrictLayer from "./DistrictLayer.jsx";
 import WindLayer from "./WindLayer.jsx";
+import HexbinLayer from "./HexbinLayer.jsx";
 import { useMapStore } from "../store/mapStore.js";
 import { leafletToViewState, viewStateToLeaflet } from "../lib/geoUtils.js";
+import { normalizeStation } from "../lib/stationUtils.js";
 
 const FLYTO_ZOOM = 13;
 
@@ -74,6 +76,7 @@ export default function MapView({ readings, onSelect, selected }) {
           <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
         ))}
       {layers.wind && <WindLayer />}
+      {layers.hexbin && <HexbinLayer stations={readings.map(normalizeStation)} />}
 
       <MapFlyTo target={selected} />
       <MapViewStateSync />

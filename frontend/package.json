@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "chart.js": "^4.5.1",
+    "d3-hexbin": "^0.2.2",
     "deck.gl": "^9.3.6",
     "leaflet": "^1.9.4",
     "leaflet-velocity": "^2.1.4",

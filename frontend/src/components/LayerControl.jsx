@@ -12,6 +12,11 @@ const LAYERS = [
     label: "Rüzgar Akışı",
     info: "10 metre yükseklikte rüzgar yönü ve hızı (Open-Meteo.com)",
   },
+  {
+    key: "hexbin",
+    label: "Hexbin (İstasyon Yoğunluğu)",
+    info: "İstasyonları altıgen hücrelerle gruplar. Ortalama AQI gösterilir. Kesikli gösterim — interpolasyon yapılmaz. İlçe özeti ile aynı anda açıksa görsel çakışabilir.",
+  },
 ];
 
 export default function LayerControl() {
