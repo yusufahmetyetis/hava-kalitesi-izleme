@@ -1,3 +1,5 @@
+import { groupStationsByDistrict } from "./stationUtils.js";
+
 // İstasyon -> İlçe sabit eşlemesi. Değiştirilmeyecek (bkz. docs/CLAUDE.md stage3-patch aşama 1).
 export const STATION_DISTRICT_MAP = {
   4143: "Fatih",
@@ -26,20 +28,6 @@ export const STATION_DISTRICT_MAP = {
   900003: "Şişli",
 };
 
-// Birden fazla istasyon aynı ilçeye düşerse ortalama AQI kullanılır.
 export function computeDistrictAQI(stations) {
-  const districtData = {};
-  for (const station of stations) {
-    const district = STATION_DISTRICT_MAP[station.station_id ?? station.id];
-    if (!district || station.aqi == null) continue;
-    if (!districtData[district]) districtData[district] = [];
-    districtData[district].push(station.aqi);
-  }
-  const result = {};
-  for (const [district, values] of Object.entries(districtData)) {
-    result[district] = Math.round(
-      values.reduce((a, b) => a + b, 0) / values.length,
-    );
-  }
-  return result;
+  return groupStationsByDistrict(stations, STATION_DISTRICT_MAP);
 }

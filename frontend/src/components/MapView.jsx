@@ -5,11 +5,9 @@ import HeatLayer from "./HeatLayer.jsx";
 import AnomalyLayer from "./AnomalyLayer.jsx";
 import DistrictLayer from "./DistrictLayer.jsx";
 import WindLayer from "./WindLayer.jsx";
-import LayerControl from "./LayerControl.jsx";
+import { useMapStore } from "../store/mapStore.js";
+import { leafletToViewState, viewStateToLeaflet } from "../lib/geoUtils.js";
 
-// İstanbul merkezli başlangıç görünümü (veriler burada yoğun).
-const ISTANBUL_CENTER = [41.05, 28.95];
-const INITIAL_ZOOM = 11;
 const FLYTO_ZOOM = 13;
 
 // Türkiye geneli pan sınırı (güneyde Akdeniz — kuzeyde Karadeniz kıyısı,
@@ -30,49 +28,55 @@ function MapFlyTo({ target }) {
   return null;
 }
 
-export default function MapView({
-  readings,
-  onSelect,
-  selected,
-  layers,
-  onToggleLayer,
-}) {
+// Leaflet'in konum/zoom'unu useMapStore'a yazar — 3D görünüme geçince aynı yerden devam
+// edilsin diye (bkz. store/mapStore.js, lib/geoUtils.js).
+function MapViewStateSync() {
+  const map = useMap();
+  const setViewState = useMapStore((s) => s.setViewState);
+  useEffect(() => {
+    function onMoveEnd() {
+      setViewState(leafletToViewState({ center: map.getCenter(), zoom: map.getZoom() }));
+    }
+    map.on("moveend", onMoveEnd);
+    return () => map.off("moveend", onMoveEnd);
+  }, [map, setViewState]);
+  return null;
+}
+
+export default function MapView({ readings, onSelect, selected }) {
+  const layers = useMapStore((s) => s.layers);
+  // Sadece ilk mount'ta kullanılır (react-leaflet center/zoom prop değişikliğini izlemez) —
+  // 3D'den 2D'ye dönünce store'daki son konumdan devam eder.
+  const initialViewState = useMapStore((s) => s.viewState);
+  const { center, zoom } = viewStateToLeaflet(initialViewState);
+
   return (
-    <div className="map-container">
-      <MapContainer
-        center={ISTANBUL_CENTER}
-        zoom={INITIAL_ZOOM}
-        minZoom={6}
-        maxBounds={TURKEY_BOUNDS}
-        maxBoundsViscosity={0.7}
-        scrollWheelZoom
-      >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          subdomains="abcd"
-          maxZoom={19}
-        />
+    <MapContainer
+      center={center}
+      zoom={zoom}
+      minZoom={6}
+      maxBounds={TURKEY_BOUNDS}
+      maxBoundsViscosity={0.7}
+      scrollWheelZoom
+    >
+      <TileLayer
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        subdomains="abcd"
+        maxZoom={19}
+      />
 
-        {layers.districts && <DistrictLayer readings={readings} />}
-        {layers.heatmap && <HeatLayer readings={readings} />}
-        {layers.anomalies && <AnomalyLayer readings={readings} />}
-        {layers.stations &&
-          readings.map((r) => (
-            <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
-          ))}
-        {layers.wind && <WindLayer />}
+      {layers.districts && <DistrictLayer readings={readings} />}
+      {layers.heatmap && <HeatLayer readings={readings} />}
+      {layers.anomalies && <AnomalyLayer readings={readings} />}
+      {layers.stations &&
+        readings.map((r) => (
+          <StationMarker key={r.station_id} reading={r} onSelect={onSelect} />
+        ))}
+      {layers.wind && <WindLayer />}
 
-        <MapFlyTo target={selected} />
-      </MapContainer>
-
-      {layers.heatmap && (
-        <div className="heatmap-notice">
-          ⚠ Bu katman interpolasyon tahminidir, ölçüm verisi değildir.
-        </div>
-      )}
-
-      <LayerControl layers={layers} onToggle={onToggleLayer} />
-    </div>
+      <MapFlyTo target={selected} />
+      <MapViewStateSync />
+    </MapContainer>
   );
 }

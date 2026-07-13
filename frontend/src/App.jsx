@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import MapView from "./components/MapView.jsx";
+import DeckGLMap from "./components/DeckGLMap.jsx";
+import LayerControl from "./components/LayerControl.jsx";
+import ViewSwitcher from "./components/ViewSwitcher.jsx";
 import DetailPanel from "./components/DetailPanel.jsx";
 import StationDetailPage from "./components/StationDetailPage.jsx";
 import { fetchLatestReadings } from "./api/client.js";
 import { useMediaQuery } from "./hooks/useMediaQuery.js";
+import { useMapStore } from "./store/mapStore.js";
 import "./app.css";
 
 const PANEL_WIDTH = 300;
@@ -14,18 +18,10 @@ export default function App() {
   const [selected, setSelected] = useState(null);
   const [view, setView] = useState("map"); // "map" | "detail"
   const [panelCollapsed, setPanelCollapsed] = useState(false);
-  const [layers, setLayers] = useState({
-    stations: true,
-    heatmap: false,
-    anomalies: false,
-    districts: false,
-    wind: true,
-  });
   const [error, setError] = useState(null);
 
-  function toggleLayer(key) {
-    setLayers((prev) => ({ ...prev, [key]: !prev[key] }));
-  }
+  const activeView = useMapStore((s) => s.activeView);
+  const setSelectedStationId = useMapStore((s) => s.setSelectedStationId);
 
   const isMobile = useMediaQuery("(max-width: 767px)");
 
@@ -37,6 +33,7 @@ export default function App() {
 
   function handleSelect(reading) {
     setSelected(reading);
+    setSelectedStationId(reading.station_id);
     setPanelCollapsed(false);
     // Mobilde ara adım yok: doğrudan tam sayfa detay. Masaüstünde önce harita + özet panel.
     setView(isMobile ? "detail" : "map");
@@ -44,6 +41,7 @@ export default function App() {
 
   function closeSelection() {
     setSelected(null);
+    setSelectedStationId(null);
     setView("map");
   }
 
@@ -55,13 +53,16 @@ export default function App() {
 
   return (
     <div className="app-layout">
-      <MapView
-        readings={readings}
-        onSelect={handleSelect}
-        selected={selected}
-        layers={layers}
-        onToggleLayer={toggleLayer}
-      />
+      <div className="map-container">
+        {activeView === "3d" ? (
+          <DeckGLMap readings={readings} onSelect={handleSelect} />
+        ) : (
+          <MapView readings={readings} onSelect={handleSelect} selected={selected} />
+        )}
+
+        <ViewSwitcher />
+        <LayerControl />
+      </div>
 
       {!isMobile && (
         <>

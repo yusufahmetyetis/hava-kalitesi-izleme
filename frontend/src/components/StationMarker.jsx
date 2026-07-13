@@ -1,6 +1,7 @@
 import { Marker } from "react-leaflet";
 import L from "leaflet";
 import { aqiColor, aqiTextColor } from "../lib/aqi.js";
+import { normalizeStation } from "../lib/stationUtils.js";
 
 // Ortasında AQI sayısı olan rozet (DivIcon) — aqicn.org/IQAir tarzı.
 function buildBadgeIcon(aqi) {
@@ -17,12 +18,15 @@ function buildBadgeIcon(aqi) {
   });
 }
 
+// Konum/AQI okuması normalizeStation üzerinden alınır — 2D (bu bileşen) ve 3D (DeckGLMap)
+// aynı şekilden okur; tıklamada DetailPanel'in ihtiyaç duyduğu ham `reading` yine de geçilir.
 export default function StationMarker({ reading, onSelect }) {
-  if (reading.lat === null || reading.lng === null) return null;
+  const station = normalizeStation(reading);
+  if (station.lat === null || station.lng === null) return null;
   return (
     <Marker
-      position={[reading.lat, reading.lng]}
-      icon={buildBadgeIcon(reading.aqi)}
+      position={[station.lat, station.lng]}
+      icon={buildBadgeIcon(station.aqi)}
       eventHandlers={{ click: () => onSelect(reading) }}
     />
   );

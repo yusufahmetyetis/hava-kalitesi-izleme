@@ -30,7 +30,7 @@ export default function WindLayer() {
       velocityScale: 0.01,
       particleAge: 60,
       lineWidth: 1,
-      particleMultiplier: 1 / 200,
+      particleMultiplier: 1 / 300,
       opacity: 0.85,
       frameRate: 20,
       colorScale: ["#41b6c4", "#2c7fb8", "#253494"],

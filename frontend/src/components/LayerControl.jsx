@@ -1,4 +1,7 @@
-// Haritanın sağ üstünde katman aç/kapa paneli. Katmanlar bağımsız.
+import { useMapStore } from "../store/mapStore.js";
+
+// Haritanın sağ üstünde katman aç/kapa paneli. Katmanlar bağımsız, state useMapStore'da
+// (2D ve 3D görünümler aynı katman görünürlüğünü paylaşır).
 const LAYERS = [
   { key: "stations", label: "İstasyonlar" },
   { key: "heatmap", label: "Isı haritası (tahmini)" },
@@ -11,7 +14,10 @@ const LAYERS = [
   },
 ];
 
-export default function LayerControl({ layers, onToggle }) {
+export default function LayerControl() {
+  const layers = useMapStore((s) => s.layers);
+  const toggleLayer = useMapStore((s) => s.toggleLayer);
+
   return (
     <div className="layer-control">
       <div className="layer-control-title">Katmanlar</div>
@@ -20,7 +26,7 @@ export default function LayerControl({ layers, onToggle }) {
           <input
             type="checkbox"
             checked={layers[l.key]}
-            onChange={() => onToggle(l.key)}
+            onChange={() => toggleLayer(l.key)}
           />
           <span>{l.label}</span>
           {l.info && (
