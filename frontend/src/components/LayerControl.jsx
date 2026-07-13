@@ -22,6 +22,11 @@ const LAYERS = [
     label: "Topoğrafya (3D)",
     info: "İstanbul topoğrafyası — Copernicus DEM GLO-30 © DLR e.V. / Airbus DS, Copernicus/ESA. Terrain tile: AWS Open Data (Mapzen elevation-tiles-prod). Uydu görüntüsü: Esri World Imagery. Yalnızca 3D görünümde etkili.",
   },
+  {
+    key: "camsHeatmap",
+    label: "İstasyon + Model Isı Haritası (Füzyon)",
+    info: "21 istasyonun gerçek ölçümü (yüksek ağırlık) ile Marmara'daki CAMS model ızgarasının (düşük ağırlık, ~11 km) IDW ile birleştirilmiş yüzeyi. İstasyona yakınken ölçüm baskın, istasyonsuz bölgelerde model boşluğu doldurur. Sadece Marmara Bölgesi'nde gösterilir.",
+  },
 ];
 
 export default function LayerControl() {

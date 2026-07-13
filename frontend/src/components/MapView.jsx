@@ -6,6 +6,7 @@ import AnomalyLayer from "./AnomalyLayer.jsx";
 import DistrictLayer from "./DistrictLayer.jsx";
 import WindLayer from "./WindLayer.jsx";
 import HexbinLayer from "./HexbinLayer.jsx";
+import CamsHeatmapLayer from "./CamsHeatmapLayer.jsx";
 import { useMapStore } from "../store/mapStore.js";
 import { leafletToViewState, viewStateToLeaflet, TURKEY_BOUNDS } from "../lib/geoUtils.js";
 import { normalizeStation } from "../lib/stationUtils.js";
@@ -69,6 +70,7 @@ export default function MapView({ readings, onSelect, selected }) {
 
       {layers.districts && <DistrictLayer readings={readings} />}
       {layers.heatmap && <HeatLayer readings={readings} />}
+      {layers.camsHeatmap && <CamsHeatmapLayer readings={readings} />}
       {layers.anomalies && <AnomalyLayer readings={readings} />}
       {layers.stations &&
         readings.map((r) => (

@@ -1,13 +1,14 @@
 // leaflet-velocity, GRIB2 tarzı U/V bileşenli grid JSON'u bekler.
-// Marmara Bölgesi bbox'u için gerçek bir 3x3 grid oluşturuyoruz (tek nokta ile
-// interpolasyon imkansız — leaflet-velocity nx-1/ny-1'e bölerek komşu noktalar arasında
-// bilinear interpolasyon yapıyor; alan büyüdükçe 2x2 tüm bölgede tek düzgün akış verir,
-// bu yüzden 3x3'e çıkarıldı).
+// Marmara Bölgesi bbox'u (lib/geoUtils.js#MARMARA_BOUNDS, CAMS füzyon katmanıyla paylaşılıyor)
+// için gerçek bir 3x3 grid oluşturuyoruz (tek nokta ile interpolasyon imkansız —
+// leaflet-velocity nx-1/ny-1'e bölerek komşu noktalar arasında bilinear interpolasyon yapıyor;
+// alan büyüdükçe 2x2 tüm bölgede tek düzgün akış verir, bu yüzden 3x3'e çıkarıldı).
+import { MARMARA_BOUNDS } from "../lib/geoUtils.js";
 
-const NORTH_LAT = 41.5;
-const SOUTH_LAT = 39.8;
-const WEST_LON = 26.0;
-const EAST_LON = 30.5;
+const NORTH_LAT = MARMARA_BOUNDS.maxLat;
+const SOUTH_LAT = MARMARA_BOUNDS.minLat;
+const WEST_LON = MARMARA_BOUNDS.minLng;
+const EAST_LON = MARMARA_BOUNDS.maxLng;
 const MID_LAT = (NORTH_LAT + SOUTH_LAT) / 2;
 const MID_LON = (WEST_LON + EAST_LON) / 2;
 

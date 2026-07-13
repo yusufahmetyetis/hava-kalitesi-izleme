@@ -23,3 +23,7 @@ export function clampToBounds(viewState, bounds = TURKEY_BOUNDS) {
     longitude: Math.min(Math.max(viewState.longitude, bounds.minLng), bounds.maxLng),
   };
 }
+
+// Marmara Bölgesi bbox'u — rüzgar ızgarası (windUtils.js) ve CAMS+istasyon füzyon katmanı
+// (camsGridService.js) aynı kutuyu paylaşır, tekrar tanımlanmasın diye tek kaynak burası.
+export const MARMARA_BOUNDS = { minLat: 39.8, maxLat: 41.5, minLng: 26.0, maxLng: 30.5 };
