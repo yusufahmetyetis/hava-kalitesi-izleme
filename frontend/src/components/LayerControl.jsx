@@ -20,7 +20,7 @@ const LAYERS = [
   {
     key: "terrain",
     label: "Topoğrafya (3D)",
-    info: "İstanbul topoğrafyası — Copernicus DEM GLO-30 © DLR e.V. / Airbus DS, Copernicus/ESA. Terrain tile: AWS Open Data (Mapzen elevation-tiles-prod). Uydu görüntüsü: Esri World Imagery. Yalnızca 3D görünümde etkili.",
+    info: "İstanbul topoğrafyası — Copernicus DEM GLO-30 © DLR e.V. / Airbus DS, Copernicus/ESA. Terrain tile: AWS Open Data (Mapzen elevation-tiles-prod). Yüzey dokusu: Esri World Topo Map. Yalnızca 3D görünümde etkili.",
   },
   {
     key: "camsHeatmap",

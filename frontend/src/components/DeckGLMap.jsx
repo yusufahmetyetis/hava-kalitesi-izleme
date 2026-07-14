@@ -18,11 +18,13 @@ const ELEVATION_SCALE = 40; // AQI birimi başına metre (görsel abartı, gerç
 // herkese açık, ücretsiz, CORS destekli Terrarium arşivine geçildi (curl ile doğrulandı).
 const TERRAIN_TILE_URL =
   "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
-// Gerçek uydu görüntüsü — CartoDB Voyager vektör-stil doku üzerinde topoğrafya seçilmiyordu
-// (kullanıcı geri bildirimi). Esri World Imagery: API key gerekmez, CORS destekli (curl ile
-// doğrulandı). Not: Esri'nin tile şeması {z}/{y}/{x} sırasında (standart XYZ'nin tersi).
+// Gerçek uydu görüntüsü yerine topoğrafik harita: CartoDB Voyager vektör-stil doku üzerinde
+// topoğrafya seçilmiyordu (kullanıcı geri bildirimi), World Imagery'den de World Topo Map'e
+// geçildi (kullanıcı tercihi — kabartma/gölgeleme + kontur çizgileri terrain'i World Imagery'nin
+// düz uydu fotoğrafından daha iyi tamamlıyor). API key gerekmez, CORS destekli, aynı Esri
+// ArcGIS Online REST şeması: {z}/{y}/{x} sırasında (standart XYZ'nin tersi).
 const SURFACE_TILE_URL =
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
 const BASE_ELEVATION_DECODER = {
   rScaler: 256,
   gScaler: 1,
@@ -100,6 +102,12 @@ export default function DeckGLMap({ readings, onSelect }) {
         texture: SURFACE_TILE_URL,
         wireframe: false,
         color: [255, 255, 255],
+        // Gölgeleme (Phong) bilinçli olarak açık bırakıldı — kullanıcı geri bildirimi: dokusuz
+        // (unlit) halde yükseklik farkları neredeyse fark edilmiyordu. Varsayılan
+        // ambient:0.35/diffuse:0.6 ışığa ters yüzeyleri fazla karartıyordu (bkz. phong-material.js
+        // defaultUniforms); ambient'i yükseltip specular'ı kapatarak genel karanlığı azaltırken
+        // eğime bağlı diffuse kontrastı (yükseklik okunabilirliği) koruyoruz.
+        material: { ambient: 0.6, diffuse: 0.6, shininess: 1, specularColor: [0, 0, 0] },
       }),
     );
   }
