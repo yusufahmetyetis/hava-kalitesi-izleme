@@ -25,7 +25,7 @@ services:
       # TODO: move secrets to .env
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: airquality
+      POSTGRES_DB: aqi_db
     ports:
       - "5432:5432"
     volumes:
