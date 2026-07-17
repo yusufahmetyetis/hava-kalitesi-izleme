@@ -4,25 +4,21 @@ import L from "leaflet";
 import "leaflet-velocity/dist/leaflet-velocity.css";
 import "leaflet-velocity";
 import { useWindData } from "../hooks/useWindData.js";
+import { useMapStore } from "../store/mapStore.js";
 
 // 10m rüzgar yönü/hızı — Open-Meteo, Marmara bbox'unun 3x3 gerçek grid'i (bkz. windUtils.js).
-// İstasyon marker'larının üstünde görünür, kendi hız göstergesini sol altta çizer.
+// İstasyon marker'larının üstünde görünür; özet hız/yön değeri sol-alt widget grubunda
+// gösterildiğinden (bkz. MapControlWidget.jsx) kütüphanenin kendi displayValues kontrolü kapalı.
 export default function WindLayer() {
   const map = useMap();
-  const { uLayer, vLayer } = useWindData();
+  const { uLayer, vLayer, windDirection, windSpeed } = useWindData();
+  const setWind = useMapStore((s) => s.setWind);
 
   useEffect(() => {
     if (!uLayer || !vLayer) return;
 
     const velocityLayer = L.velocityLayer({
-      displayValues: true,
-      displayOptions: {
-        velocityType: "Rüzgar",
-        position: "bottomleft",
-        emptyString: "Rüzgar yok",
-        angleConvention: "bearingCW",
-        speedUnit: "m/s",
-      },
+      displayValues: false,
       data: [uLayer, vLayer],
       // İstanbul'da tipik rüzgar 0.5-4 m/s civarı; maxVelocity gerçekçi tutulmazsa
       // tüm değerler renk skalasının en soluk ucuna düşüp görünmez hale geliyor.
@@ -39,6 +35,14 @@ export default function WindLayer() {
     velocityLayer.addTo(map);
     return () => map.removeLayer(velocityLayer);
   }, [map, uLayer, vLayer]);
+
+  useEffect(() => {
+    setWind(windDirection, windSpeed);
+  }, [windDirection, windSpeed, setWind]);
+
+  useEffect(() => {
+    return () => setWind(null, null);
+  }, [setWind]);
 
   return null;
 }

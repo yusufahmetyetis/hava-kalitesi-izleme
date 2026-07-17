@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import MapView from "./components/MapView.jsx";
 import DeckGLMap from "./components/DeckGLMap.jsx";
-import LayerControl from "./components/LayerControl.jsx";
+import MapControlWidget from "./components/MapControlWidget.jsx";
 import ViewSwitcher from "./components/ViewSwitcher.jsx";
 import DetailPanel from "./components/DetailPanel.jsx";
 import StationDetailPage from "./components/StationDetailPage.jsx";
@@ -74,10 +74,7 @@ function MapDashboard() {
         )}
 
         <ViewSwitcher />
-        <LayerControl />
-        <Link to="/energy" className="energy-link">
-          Energy →
-        </Link>
+        <MapControlWidget />
       </div>
 
       {!isMobile && (

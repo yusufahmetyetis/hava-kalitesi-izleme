@@ -37,4 +37,8 @@ export const useMapStore = create((set) => ({
     set((s) => ({ layers: { ...s.layers, [key]: visible } })),
   toggleLayer: (key) =>
     set((s) => ({ layers: { ...s.layers, [key]: !s.layers[key] } })),
+
+  // WindLayer'ın çözdüğü Marmara grid'inin orta noktası — sol-alt widget kartında gösterilir.
+  wind: { direction: null, speed: null },
+  setWind: (direction, speed) => set({ wind: { direction, speed } }),
 }));

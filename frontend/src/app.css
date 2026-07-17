@@ -533,25 +533,84 @@
   color: #666;
 }
 
-/* ---- Energy dashboard linki ---- */
-.energy-link {
+/* ---- Sol alt katman + energy widget'ı ---- */
+.map-control-widget {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  bottom: 0;
+  left: 12px;
   z-index: 1000;
-  padding: 8px 14px;
-  font-size: 14px;
+  width: 190px;
+  max-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* 3D görünümde terrain slider'ıyla (.terrain-scale-control) çakışmasın diye yukarı kaydırılmış hali */
+.map-control-widget--elevated {
+  bottom: 77px;
+}
+
+.widget-energy-btn {
+  display: block;
+  text-align: center;
+  padding: 8px 10px;
   font-weight: 600;
-  color: #3366cc;
+  color: #111;
   background: #fff;
-  border: 1px solid #dcdfe6;
+  border: 1px solid #ccc;
   border-radius: 6px;
   text-decoration: none;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
-.energy-link:hover {
-  background: #eef0f4;
+.widget-energy-btn:hover {
+  background: #f5f5f5;
+}
+
+.widget-layers-accordion {
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.widget-layers-toggle {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  font-weight: 700;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.widget-layers-body {
+  padding: 0 10px 8px;
+  border-top: 1px solid #eee;
+}
+
+.widget-wind-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  padding-bottom: 20px;
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  font-size: 13px;
+  color: #333;
+}
+
+.wind-arrow {
+  display: inline-block;
+  font-size: 14px;
+  transition: transform 0.3s ease;
 }
 
 /* ---- Enerji anomali kartları ---- */
