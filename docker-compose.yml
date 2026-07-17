@@ -33,11 +33,14 @@ services:
       - ./timescaledb/init:/docker-entrypoint-initdb.d
 
   aqi-publisher:
-    # TODO: placeholder, refine build/command later
     build:
       context: .
       dockerfile: mqtt/Dockerfile
     command: ["python", "mqtt/publisher.py"]
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: "1883"
+      WAQI_TOKEN: ${WAQI_TOKEN}
     networks:
       - aqi-network
     depends_on:
@@ -45,11 +48,18 @@ services:
     restart: on-failure
 
   aqi-subscriber:
-    # TODO: placeholder, refine build/command later
     build:
       context: .
       dockerfile: mqtt/Dockerfile
     command: ["python", "-m", "mqtt.subscriber.consumer"]
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: "1883"
+      DB_HOST: timescaledb
+      DB_PORT: "5432"
+      DB_NAME: aqi_db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - aqi-network
     depends_on:
