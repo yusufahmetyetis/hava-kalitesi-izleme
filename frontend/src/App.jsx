@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import MapView from "./components/MapView.jsx";
 import DeckGLMap from "./components/DeckGLMap.jsx";
@@ -6,6 +7,7 @@ import LayerControl from "./components/LayerControl.jsx";
 import ViewSwitcher from "./components/ViewSwitcher.jsx";
 import DetailPanel from "./components/DetailPanel.jsx";
 import StationDetailPage from "./components/StationDetailPage.jsx";
+import EnergyDashboard from "./pages/EnergyDashboard.jsx";
 import { fetchLatestReadings } from "./api/client.js";
 import { useMediaQuery } from "./hooks/useMediaQuery.js";
 import { useMapStore } from "./store/mapStore.js";
@@ -14,6 +16,17 @@ import "./app.css";
 const PANEL_WIDTH = 300;
 
 export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MapDashboard />} />
+        <Route path="/energy" element={<EnergyDashboard />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function MapDashboard() {
   const [readings, setReadings] = useState([]);
   const [selected, setSelected] = useState(null);
   const [view, setView] = useState("map"); // "map" | "detail"
@@ -62,6 +75,9 @@ export default function App() {
 
         <ViewSwitcher />
         <LayerControl />
+        <Link to="/energy" className="energy-link">
+          Energy →
+        </Link>
       </div>
 
       {!isMobile && (

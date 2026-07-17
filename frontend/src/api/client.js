@@ -19,3 +19,19 @@ export function fetchHistory(stationId, range) {
 export function fetchCalendar(stationId) {
   return getJSON(`/stations/${stationId}/calendar`);
 }
+
+export function fetchHouseholds() {
+  return getJSON("/energy/households");
+}
+
+export function fetchHouseholdReadings(householdCode) {
+  return getJSON(`/energy/readings/${householdCode}`);
+}
+
+export function fetchEnergyAnomalies() {
+  return getJSON("/energy/anomalies");
+}
+
+export function fetchAqiCorrelation() {
+  return getJSON("/energy/aqi-correlation");
+}

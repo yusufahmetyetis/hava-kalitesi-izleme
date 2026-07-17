@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import readings, stations
+from .routers import energy, readings, stations
 
 app = FastAPI(title="Hava Kalitesi İzleme BFF")
 
@@ -15,3 +15,4 @@ app.add_middleware(
 
 app.include_router(stations.router)
 app.include_router(readings.router)
+app.include_router(energy.router)
