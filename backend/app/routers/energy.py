@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from ..deps import get_db, get_energy_db
 from ..schemas.energy import (
     AqiCorrelationPointOut,
-    ElectricityReadingOut,
     EnergyAnomalyOut,
     HouseholdOut,
+    HourlyConsumptionOut,
 )
 from ..services import energy as energy_service
 
@@ -18,7 +18,7 @@ def list_households(energy_db: Session = Depends(get_energy_db)):
     return energy_service.list_households(energy_db)
 
 
-@router.get("/readings/{household_code}", response_model=list[ElectricityReadingOut])
+@router.get("/readings/{household_code}", response_model=list[HourlyConsumptionOut])
 def get_readings(household_code: str, energy_db: Session = Depends(get_energy_db)):
     readings = energy_service.get_recent_readings(energy_db, household_code)
     if not readings:

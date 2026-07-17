@@ -17,21 +17,29 @@ function timeLabel(iso) {
   });
 }
 
+function hourLabel(iso) {
+  return new Date(iso).toLocaleTimeString("tr-TR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function HouseholdChart({ readings }) {
   if (!readings.length) {
     return <p className="chart-empty">Bu hane için son 24 saatte veri yok.</p>;
   }
   const data = {
-    labels: readings.map((r) => timeLabel(r.measured_at)),
+    labels: readings.map((r) => hourLabel(r.hour)),
     datasets: [
       {
         label: "Tüketim (kWh)",
         data: readings.map((r) => r.consumption_kwh),
-        borderColor: "#2f7d4f",
-        backgroundColor: "#2f7d4f",
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.15)",
         borderWidth: 2,
         pointRadius: 2,
-        tension: 0.25,
+        tension: 0.4,
+        fill: true,
       },
     ],
   };

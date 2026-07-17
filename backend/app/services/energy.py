@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 
 from ..schemas.energy import (
     AqiCorrelationPointOut,
-    ElectricityReadingOut,
     EnergyAnomalyOut,
     HouseholdOut,
+    HourlyConsumptionOut,
 )
 
 
@@ -23,21 +23,23 @@ def list_households(energy_db: Session) -> list[HouseholdOut]:
     return [HouseholdOut(**row) for row in rows]
 
 
-def get_recent_readings(energy_db: Session, household_code: str) -> list[ElectricityReadingOut]:
+def get_recent_readings(energy_db: Session, household_code: str) -> list[HourlyConsumptionOut]:
     rows = energy_db.execute(
         text(
             """
-            SELECT er.measured_at, er.device, er.consumption_kwh
+            SELECT time_bucket('1 hour', er.measured_at) AS hour,
+                   sum(er.consumption_kwh) AS consumption_kwh
             FROM electricity_readings er
             JOIN households h ON h.id = er.household_id
             WHERE h.household_code = :code
               AND er.measured_at >= now() - interval '24 hours'
-            ORDER BY er.measured_at
+            GROUP BY 1
+            ORDER BY 1
             """
         ),
         {"code": household_code},
     ).mappings()
-    return [ElectricityReadingOut(**row) for row in rows]
+    return [HourlyConsumptionOut(**row) for row in rows]
 
 
 def get_anomalies(energy_db: Session, limit: int) -> list[EnergyAnomalyOut]:

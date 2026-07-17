@@ -16,10 +16,9 @@ class HouseholdOut(BaseModel):
     has_gas_boiler: bool | None
 
 
-class ElectricityReadingOut(BaseModel):
-    measured_at: datetime
-    device: str | None
-    consumption_kwh: float | None
+class HourlyConsumptionOut(BaseModel):
+    hour: datetime
+    consumption_kwh: float
 
 
 class EnergyAnomalyOut(BaseModel):
