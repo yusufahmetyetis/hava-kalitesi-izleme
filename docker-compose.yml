@@ -68,10 +68,16 @@ services:
     restart: on-failure
 
   backend:
-    # TODO: placeholder, refine later
     build:
       context: .
       dockerfile: backend/Dockerfile
+    environment:
+      DB_HOST: timescaledb
+      DB_PORT: "5432"
+      DB_NAME: aqi_db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      PORT: "8000"
     networks:
       - aqi-network
     ports:
@@ -81,14 +87,13 @@ services:
     restart: on-failure
 
   frontend:
-    # TODO: placeholder, refine later
     build:
       context: ./frontend
       dockerfile: Dockerfile
     networks:
       - aqi-network
     ports:
-      - "5173:5173"
+      - "3000:80"
     depends_on:
       - backend
     restart: on-failure
