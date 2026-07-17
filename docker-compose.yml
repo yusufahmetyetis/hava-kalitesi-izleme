@@ -22,9 +22,8 @@ services:
     networks:
       - aqi-network
     environment:
-      # TODO: move secrets to .env
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: aqi_db
     ports:
       - "5432:5432"
@@ -114,7 +113,6 @@ services:
     restart: always
 
   flink-taskmanager:
-    # TODO: placeholder, refine later
     build:
       context: ./flink-taskmanager
       dockerfile: Dockerfile
@@ -127,13 +125,31 @@ services:
       FLINK_PROPERTIES: |
         jobmanager.rpc.address: flink-jobmanager
         taskmanager.numberOfTaskSlots: 2
+      DB_HOST: timescaledb
+      DB_PORT: "5432"
+      DB_NAME: energy_demo
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     restart: always
 
   flink-job:
-    # TODO: placeholder, no real job jar yet
     build:
       context: ./flink-job
       dockerfile: Dockerfile
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: "1883"
+      DB_HOST: timescaledb
+      DB_PORT: "5432"
+      DB_NAME: energy_demo
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    command: >
+      bash -c "sleep 15 &&
+      flink run
+      -m flink-jobmanager:8081
+      -c com.energydemo.EnergyStreamJob
+      /app/energy-flink-job.jar"
     networks:
       - aqi-network
     depends_on:
@@ -144,7 +160,6 @@ services:
     restart: on-failure
 
   energy-publisher:
-    # TODO: placeholder, energy domain not yet implemented
     build:
       context: ./energy/publisher
       dockerfile: Dockerfile

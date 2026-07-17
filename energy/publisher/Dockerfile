@@ -1,4 +1,7 @@
-# TODO: placeholder image for energy-publisher, refine later
-FROM python:3.12-slim
+FROM python:3.11-slim
 WORKDIR /app
-CMD ["python", "-c", "print('TODO: energy-publisher not yet implemented')"]
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY publisher.py .
+ENV PYTHONUNBUFFERED=1
+CMD ["python", "-u", "publisher.py"]
