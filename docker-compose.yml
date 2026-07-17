@@ -1,0 +1,140 @@
+networks:
+  aqi-network:
+    driver: bridge
+
+volumes:
+  timescale_data:
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    networks:
+      - aqi-network
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    networks:
+      - aqi-network
+    environment:
+      # TODO: move secrets to .env
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: airquality
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./timescaledb/init:/docker-entrypoint-initdb.d
+
+  aqi-publisher:
+    # TODO: placeholder, refine build/command later
+    build:
+      context: .
+      dockerfile: mqtt/Dockerfile
+    command: ["python", "mqtt/publisher.py"]
+    networks:
+      - aqi-network
+    depends_on:
+      - mosquitto
+    restart: on-failure
+
+  aqi-subscriber:
+    # TODO: placeholder, refine build/command later
+    build:
+      context: .
+      dockerfile: mqtt/Dockerfile
+    command: ["python", "-m", "mqtt.subscriber.consumer"]
+    networks:
+      - aqi-network
+    depends_on:
+      - mosquitto
+      - timescaledb
+    restart: on-failure
+
+  backend:
+    # TODO: placeholder, refine later
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    networks:
+      - aqi-network
+    ports:
+      - "8000:8000"
+    depends_on:
+      - timescaledb
+    restart: on-failure
+
+  frontend:
+    # TODO: placeholder, refine later
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    networks:
+      - aqi-network
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: on-failure
+
+  flink-jobmanager:
+    # TODO: placeholder, no custom image yet
+    image: flink:1.19-scala_2.12-java11
+    command: jobmanager
+    networks:
+      - aqi-network
+    ports:
+      - "8081:8081"
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: flink-jobmanager
+        rest.address: flink-jobmanager
+        rest.port: 8081
+    restart: always
+
+  flink-taskmanager:
+    # TODO: placeholder, refine later
+    build:
+      context: ./flink-taskmanager
+      dockerfile: Dockerfile
+    command: taskmanager
+    networks:
+      - aqi-network
+    depends_on:
+      - flink-jobmanager
+    environment:
+      FLINK_PROPERTIES: |
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.numberOfTaskSlots: 2
+    restart: always
+
+  flink-job:
+    # TODO: placeholder, no real job jar yet
+    build:
+      context: ./flink-job
+      dockerfile: Dockerfile
+    networks:
+      - aqi-network
+    depends_on:
+      - mosquitto
+      - timescaledb
+      - flink-jobmanager
+      - flink-taskmanager
+    restart: on-failure
+
+  energy-publisher:
+    # TODO: placeholder, energy domain not yet implemented
+    build:
+      context: ./energy/publisher
+      dockerfile: Dockerfile
+    networks:
+      - aqi-network
+    depends_on:
+      - mosquitto
+    restart: on-failure
