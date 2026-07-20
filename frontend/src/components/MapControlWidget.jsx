@@ -35,7 +35,6 @@ export default function MapControlWidget() {
   const [layersOpen, setLayersOpen] = useState(false);
   const layers = useMapStore((s) => s.layers);
   const toggleLayer = useMapStore((s) => s.toggleLayer);
-  const wind = useMapStore((s) => s.wind);
   const activeView = useMapStore((s) => s.activeView);
 
   // 3D görünümde terrain katmanı açıkken deck.gl'in "yükseklik abartması" slider'ı
@@ -77,19 +76,6 @@ export default function MapControlWidget() {
           </div>
         )}
       </div>
-
-      {layers.wind && wind.direction != null && wind.speed != null && (
-        <div className="widget-wind-card">
-          <span
-            className="wind-arrow"
-            style={{ transform: `rotate(${wind.direction}deg)` }}
-          >
-            ▲
-          </span>
-          <span>{Math.round(wind.direction)}°</span>
-          <span>{wind.speed.toFixed(1)} m/s</span>
-        </div>
-      )}
     </div>
   );
 }

@@ -46,8 +46,7 @@ function toUV(speed, direction) {
 }
 
 // openMeteoResponses: /v1/forecast çoklu konum yanıtı (sıra WIND_GRID.points ile aynı) →
-// leaflet-velocity'nin data: [uLayer, vLayer] formatı + grid'in orta noktasının ham
-// hız/yön değeri (İstanbul/Marmara'yı temsilen tek özet nokta, widget kartında gösterilir).
+// leaflet-velocity'nin data: [uLayer, vLayer] formatı.
 export function parseWindData(openMeteoResponses) {
   const pointCount = WIND_GRID.points.length;
   if (!Array.isArray(openMeteoResponses) || openMeteoResponses.length !== pointCount) {
@@ -60,14 +59,10 @@ export function parseWindData(openMeteoResponses) {
 
   const uData = [];
   const vData = [];
-  let center = null;
-  const centerIndex = Math.floor(pointCount / 2);
-  for (let i = 0; i < openMeteoResponses.length; i++) {
-    const res = openMeteoResponses[i];
+  for (const res of openMeteoResponses) {
     const speed = res.hourly?.wind_speed_10m?.[index];
     const direction = res.hourly?.wind_direction_10m?.[index];
     if (speed == null || direction == null) return null;
-    if (i === centerIndex) center = { speed, direction };
     const { u, v } = toUV(speed, direction);
     uData.push(u);
     vData.push(v);
@@ -107,6 +102,5 @@ export function parseWindData(openMeteoResponses) {
       header: { ...baseHeader, parameterNumber: 3, parameterNumberName: "Northward wind" },
       data: vData,
     },
-    center,
   ];
 }

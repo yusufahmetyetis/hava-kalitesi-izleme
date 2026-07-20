@@ -536,7 +536,9 @@
 /* ---- Sol alt katman + energy widget'ı ---- */
 .map-control-widget {
   position: absolute;
-  bottom: 0;
+  /* leaflet-velocity'nin kendi "Rüzgar Direction/Speed" metni de sol altta (~20-25px
+     yükseklik) çiziliyor — üstüne binmesin diye widget grubu biraz yukarı kaldırıldı. */
+  bottom: 35px;
   left: 12px;
   z-index: 1000;
   width: 190px;
@@ -591,26 +593,6 @@
 .widget-layers-body {
   padding: 0 10px 8px;
   border-top: 1px solid #eee;
-}
-
-.widget-wind-card {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  padding-bottom: 20px;
-  background: #fff;
-  border: 1px solid #dcdfe6;
-  border-radius: 6px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
-  font-size: 13px;
-  color: #333;
-}
-
-.wind-arrow {
-  display: inline-block;
-  font-size: 14px;
-  transition: transform 0.3s ease;
 }
 
 /* ---- Enerji anomali kartları ---- */

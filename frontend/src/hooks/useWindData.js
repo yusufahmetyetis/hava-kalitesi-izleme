@@ -6,8 +6,6 @@ const REFRESH_MS = 30 * 60 * 1000; // rüzgar AQI'ye göre daha yavaş değişir
 export function useWindData() {
   const [uLayer, setULayer] = useState(null);
   const [vLayer, setVLayer] = useState(null);
-  const [windDirection, setWindDirection] = useState(null);
-  const [windSpeed, setWindSpeed] = useState(null);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
@@ -21,11 +19,9 @@ export function useWindData() {
         setError("Rüzgar verisi alınamadı");
         return;
       }
-      const [u, v, center] = result;
+      const [u, v] = result;
       setULayer(u);
       setVLayer(v);
-      setWindDirection(center?.direction ?? null);
-      setWindSpeed(center?.speed ?? null);
       setError(null);
       setLastUpdated(new Date());
     }
@@ -38,5 +34,5 @@ export function useWindData() {
     };
   }, []);
 
-  return { uLayer, vLayer, windDirection, windSpeed, error, lastUpdated };
+  return { uLayer, vLayer, error, lastUpdated };
 }
