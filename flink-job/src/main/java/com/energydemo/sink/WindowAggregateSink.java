@@ -46,6 +46,7 @@ public class WindowAggregateSink extends RichSinkFunction<WindowAggregate> {
 
     @Override
     public void open(Configuration parameters) throws Exception {
+        Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(jdbcUrl, user, password);
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(CREATE_TABLE_SQL);

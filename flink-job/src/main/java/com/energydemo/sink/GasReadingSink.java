@@ -32,6 +32,7 @@ public class GasReadingSink extends RichSinkFunction<EnergyReading> {
 
     @Override
     public void open(Configuration parameters) throws Exception {
+        Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(jdbcUrl, user, password);
         householdMap = HouseholdLookup.load(connection);
         insertStmt = connection.prepareStatement(
