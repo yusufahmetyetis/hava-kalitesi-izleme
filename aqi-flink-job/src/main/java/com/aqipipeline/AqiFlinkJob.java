@@ -8,16 +8,14 @@ import com.aqipipeline.parser.AqiReadingParser;
 import com.aqipipeline.process.AnomalyDetector;
 import com.aqipipeline.process.WindowAggregator;
 import com.aqipipeline.sink.AnomalySink;
+import com.aqipipeline.sink.RawReadingsSink;
 import com.aqipipeline.sink.StationSink;
 import com.aqipipeline.sink.WindowAggregateSink;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-
-import java.time.Duration;
 
 public class AqiFlinkJob {
 
@@ -41,18 +39,20 @@ public class AqiFlinkJob {
 
         SingleOutputStreamOperator<AqiReading> readings = rawMessages
                 .flatMap(new AqiReadingParser())
-                .name("parse-and-filter")
-                .assignTimestampsAndWatermarks(
-                        WatermarkStrategy.<AqiReading>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                                .withTimestampAssigner((reading, ts) -> reading.getMeasuredAt().toEpochMilli()));
+                .name("parse-and-filter");
 
         // Keep the "stations" table alive - aqi-subscriber, its previous owner, is gone
         readings.addSink(new StationSink(jdbcUrl, dbUser, dbPassword)).name("station-sink");
 
-        // 5-minute tumbling window aggregation per station
+        readings.addSink(new RawReadingsSink(jdbcUrl, dbUser, dbPassword))
+                .name("raw-readings-sink");
+
+        // 5-minute tumbling window aggregation per station. Processing time, not event time:
+        // WAQI's own measured_at only advances roughly hourly, so an event-time watermark tied
+        // to it would stall and windows would never close even though we poll every 5 minutes.
         DataStream<WindowAggregate> windowAggregates = readings
                 .keyBy(AqiReading::getStationId)
-                .window(TumblingEventTimeWindows.of(Time.minutes(5)))
+                .window(TumblingProcessingTimeWindows.of(Time.minutes(5)))
                 .aggregate(new WindowAggregator.Aggregate(), new WindowAggregator.ToWindowAggregate())
                 .name("window-aggregate");
 

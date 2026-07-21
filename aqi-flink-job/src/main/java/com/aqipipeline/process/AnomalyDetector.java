@@ -8,6 +8,8 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Keeps an exponential moving average of AQI per station. Readings that deviate
@@ -16,6 +18,8 @@ import org.apache.flink.util.OutputTag;
  * the moving average.
  */
 public class AnomalyDetector extends KeyedProcessFunction<Integer, AqiReading, AqiReading> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AnomalyDetector.class);
 
     public static final OutputTag<AnomalyEvent> ANOMALY_TAG = new OutputTag<AnomalyEvent>("anomalies") {
     };
@@ -64,6 +68,9 @@ public class AnomalyDetector extends KeyedProcessFunction<Integer, AqiReading, A
                 : EMA_ALPHA * reading.getAqi() + (1 - EMA_ALPHA) * movingAverage;
         movingAverageState.update(updatedAverage);
         sampleCountState.update(sampleCount + 1);
+
+        LOG.debug("station={} aqi={} moving_avg={} samples={}",
+                reading.getStationId(), reading.getAqi(), String.format("%.1f", updatedAverage), sampleCount + 1);
 
         out.collect(reading);
     }

@@ -77,3 +77,19 @@ class FilteredReading(Base):
     validity_notes = Column(Text)
     algo_version = Column(Text)
     filtered_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class AqiAnomaly(Base):
+    """Populated live by aqi-flink-job's AnomalySink (EMA-based), not filtered_readings' z-score."""
+
+    __tablename__ = "aqi_anomalies"
+
+    id = Column(Integer, primary_key=True)
+    station_id = Column(Integer)
+    station_name = Column(Text)
+    measured_at = Column(DateTime(timezone=True))
+    actual_aqi = Column(Integer)
+    expected_aqi = Column(Double)
+    deviation_pct = Column(Double)
+    severity = Column(Text)
+    detected_at = Column(DateTime(timezone=True), server_default=func.now())

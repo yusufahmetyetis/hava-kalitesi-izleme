@@ -65,7 +65,7 @@ public class AnomalySink extends RichSinkFunction<AnomalyEvent> {
             insertStmt.setDouble(6, event.getDeviationPct());
             insertStmt.setString(7, event.getSeverity());
             insertStmt.executeUpdate();
-            LOG.info("Anomaly detected: station={} severity={} actual={} expected={} deviation={}%",
+            LOG.info("aqi_anomalies ⚠ station={} severity={} actual={} expected={} deviation={}%",
                     event.getStationId(), event.getSeverity(), event.getActualAqi(),
                     String.format("%.1f", event.getExpectedAqi()), String.format("%.1f", event.getDeviationPct()));
         } catch (Exception e) {

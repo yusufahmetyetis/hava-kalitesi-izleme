@@ -42,6 +42,8 @@ public class StationSink extends RichSinkFunction<AqiReading> {
         try {
             StationUpsert.upsert(connection, reading.getStationId(), reading.getStationName(),
                     reading.getLat(), reading.getLng());
+            LOG.debug("stations ↑ id={} name={} lat={} lng={}",
+                    reading.getStationId(), reading.getStationName(), reading.getLat(), reading.getLng());
         } catch (Exception e) {
             LOG.error("Failed to upsert station {}: {}", reading.getStationId(), e.getMessage());
         }

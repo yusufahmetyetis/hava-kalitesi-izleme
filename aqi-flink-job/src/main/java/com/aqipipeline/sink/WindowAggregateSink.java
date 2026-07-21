@@ -78,6 +78,9 @@ public class WindowAggregateSink extends RichSinkFunction<WindowAggregate> {
             insertStmt.setInt(8, agg.getMaxAqi());
             insertStmt.setLong(9, agg.getSampleCount());
             insertStmt.executeUpdate();
+            LOG.info("aqi_window_aggregates ← station={} ({}) window=[{},{}) avg_aqi={} max_aqi={} count={}",
+                    agg.getStationId(), agg.getStationName(), agg.getWindowStart(), agg.getWindowEnd(),
+                    String.format("%.1f", agg.getAvgAqi()), agg.getMaxAqi(), agg.getSampleCount());
         } catch (Exception e) {
             LOG.error("Failed to insert window aggregate for station {}: {}", agg.getStationId(), e.getMessage());
         }

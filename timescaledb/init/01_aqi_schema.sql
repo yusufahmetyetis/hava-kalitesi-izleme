@@ -60,6 +60,9 @@ CREATE TABLE IF NOT EXISTS filtered_readings (
 SELECT create_hypertable('raw_readings', 'measured_at', if_not_exists => TRUE);
 SELECT create_hypertable('processed_readings', 'measured_at', if_not_exists => TRUE);
 
+-- required for aqi-flink-job's RawReadingsSink.java ON CONFLICT (station_id, measured_at) DO NOTHING
+CREATE UNIQUE INDEX IF NOT EXISTS raw_readings_station_measured_uniq ON raw_readings (station_id, measured_at);
+
 -- kept identical to the CREATE_TABLE_SQL in aqi-flink-job's WindowAggregateSink.java
 CREATE TABLE IF NOT EXISTS aqi_window_aggregates (
     id SERIAL PRIMARY KEY,

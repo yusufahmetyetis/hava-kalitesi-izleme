@@ -61,13 +61,11 @@ class AnomalyOut(BaseModel):
     station_id: int
     station_name: str | None
     measured_at: datetime | None
-    aqi: int | None
-    z_score: float | None
-    baseline_mean: float | None
-    baseline_std: float | None
-    is_valid: bool | None
-    validity_notes: str | None
-    algo_version: str | None
+    actual_aqi: int | None
+    expected_aqi: float | None
+    deviation_pct: float | None
+    severity: str | None
+    detected_at: datetime | None
 
 
 class CalendarDayOut(BaseModel):

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
+from shared.aqi import category
 from shared.models import FilteredReading, ProcessedReading, RawReading, Station
 
 ALGO_VERSION = "v1"
@@ -11,20 +12,6 @@ BASELINE_WINDOW_HOURS = 24
 BASELINE_MIN_COUNT = 5
 ANOMALY_Z_THRESHOLD = 2.0
 POLLUTANT_KEYS = ("pm25", "pm10", "o3", "no2", "so2", "co")
-
-
-def category(aqi):
-    if aqi is None:
-        return "Bilinmiyor"
-    if aqi <= 50:
-        return "İyi"
-    if aqi <= 100:
-        return "Orta"
-    if aqi <= 150:
-        return "Hassas Gruplar İçin Sağlıksız"
-    if aqi <= 200:
-        return "Sağlıksız"
-    return "Çok Sağlıksız"
 
 
 def is_duplicate(session, payload: dict) -> bool:

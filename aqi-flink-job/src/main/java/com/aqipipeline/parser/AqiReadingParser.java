@@ -37,6 +37,8 @@ public class AqiReadingParser implements FlatMapFunction<String, AqiReading> {
             Instant measuredAt = OffsetDateTime.parse(node.get("measured_at").asText()).toInstant();
             int aqi = node.get("aqi").asInt();
 
+            LOG.debug("Parsed reading: station={} ({}) aqi={} measured_at={}", stationId, stationName, aqi, measuredAt);
+
             out.collect(new AqiReading(
                     stationId,
                     stationName,
