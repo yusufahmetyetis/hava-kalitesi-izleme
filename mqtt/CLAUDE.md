@@ -5,14 +5,15 @@ Bu klasörde çalışırken kök CLAUDE.md kuralları da geçerli (özellikle: o
 ## Kapsam
 - `publisher.py`: WAQI'den İstanbul istasyon verisini çekip MQTT'ye yayınlar (mevcut mantık korunur,
   sadece token `.env`'den okunacak şekilde değişir).
-- `subscriber/`: MQTT'den gelen mesajı SQLAlchemy ile DB'ye yazar. Tek dosya değil, modüler:
-  - `handlers.py` → mesaj payload'ını alıp DB'ye yazan fonksiyon(lar); ileride "algoritma" buraya
-    kolayca eklenebilecek şekilde ayrılmalı (ham kayıt yazma ile işlenmiş kayıt yazma net ayrı adımlar
-    olsun, aralarına sonradan bir "process()" adımı sokulabilsin)
-  - `consumer.py` → mqtt client kurulumu, on_connect/on_message, ana döngü
-- engine/session (`db.py`) ve ORM modelleri (`models.py`) artık burada değil, kök seviyede
-  `shared/` paketinde (backend ile paylaşılıyor, bkz. kök `CLAUDE.md`). `handlers.py` ve
-  `consumer.py` bunları `from shared.db import ...` / `from shared.models import ...` ile alır.
+- `subscriber/handlers.py`: **artık canlı bir servis değil.** MQTT tüketimi ve `stations`/
+  `raw_readings`/`aqi_window_aggregates`/`aqi_anomalies` yazımı `aqi-flink-job` (Java) servisine
+  taşındı — bkz. kök `CLAUDE.md` ve `aqi-flink-job/`. `consumer.py` bu geçişle birlikte silindi.
+  `handlers.py` sadece `backfill_sim.py`'nin bağımlılığı olarak duruyor (`filter_reading`,
+  `process_reading` — zscore anomali/kategori mantığı); `processed_readings`/`filtered_readings`
+  tabloları artık sadece backfill ile doldurulur, canlı akıştan beslenmez.
+- engine/session (`db.py`) ve ORM modelleri (`models.py`) kök seviyede `shared/` paketinde
+  (backend ile paylaşılıyor, bkz. kök `CLAUDE.md`). `handlers.py` bunları
+  `from shared.db import ...` / `from shared.models import ...` ile alır.
 
 ## Kısıtlar
 - Mevcut `category()` fonksiyonu (AQI eşikleri) ve JSON payload yapısı değişmeyecek, sadece taşınacak.
