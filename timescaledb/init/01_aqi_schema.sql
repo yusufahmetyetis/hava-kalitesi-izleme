@@ -65,7 +65,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS raw_readings_station_measured_uniq ON raw_read
 
 -- kept identical to the CREATE_TABLE_SQL in aqi-flink-job's WindowAggregateSink.java
 CREATE TABLE IF NOT EXISTS aqi_window_aggregates (
-    id SERIAL PRIMARY KEY,
+    id SERIAL,
     station_id INTEGER NOT NULL,
     station_name TEXT,
     window_start TIMESTAMPTZ NOT NULL,
@@ -75,12 +75,14 @@ CREATE TABLE IF NOT EXISTS aqi_window_aggregates (
     avg_pm10 NUMERIC(6, 2),
     max_aqi INTEGER NOT NULL,
     sample_count INTEGER NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT now()
+    created_at TIMESTAMPTZ DEFAULT now(),
+    -- window_start partition kolonu olduğu için PK'ye dahil edilmeli (TimescaleDB kısıtı)
+    PRIMARY KEY (id, window_start)
 );
 
 -- kept identical to the CREATE_TABLE_SQL in aqi-flink-job's AnomalySink.java
 CREATE TABLE IF NOT EXISTS aqi_anomalies (
-    id SERIAL PRIMARY KEY,
+    id SERIAL,
     station_id INTEGER NOT NULL,
     station_name TEXT,
     measured_at TIMESTAMPTZ NOT NULL,
@@ -88,7 +90,9 @@ CREATE TABLE IF NOT EXISTS aqi_anomalies (
     expected_aqi NUMERIC(6, 2) NOT NULL,
     deviation_pct NUMERIC(6, 2) NOT NULL,
     severity VARCHAR(8) NOT NULL,
-    detected_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    detected_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- detected_at partition kolonu olduğu için PK'ye dahil edilmeli (TimescaleDB kısıtı)
+    PRIMARY KEY (id, detected_at)
 );
 
 SELECT create_hypertable('aqi_window_aggregates', 'window_start', if_not_exists => TRUE);
