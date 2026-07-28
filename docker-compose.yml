@@ -125,7 +125,9 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     command: >
-      bash -c "sleep 15 &&
+      bash -c "
+      until (exec 3<>/dev/tcp/timescaledb/5432) 2>/dev/null; do sleep 1; done &&
+      until (exec 3<>/dev/tcp/flink-jobmanager/8081) 2>/dev/null; do sleep 1; done &&
       flink run
       -m flink-jobmanager:8081
       -c com.energydemo.EnergyStreamJob
@@ -152,7 +154,9 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     command: >
-      bash -c "sleep 15 &&
+      bash -c "
+      until (exec 3<>/dev/tcp/timescaledb/5432) 2>/dev/null; do sleep 1; done &&
+      until (exec 3<>/dev/tcp/flink-jobmanager/8081) 2>/dev/null; do sleep 1; done &&
       flink run
       -m flink-jobmanager:8081
       -c com.aqipipeline.AqiFlinkJob
