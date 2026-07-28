@@ -1,0 +1,25 @@
+# backend/Dockerfile ve mqtt/Dockerfile build context olarak repo kökünü kullanır.
+# mosquitto/data/mosquitto.db container tarafından uid 1883 + 0600 ile yazıldığından
+# host kullanıcısı okuyamaz ve context hazırlanırken build patlar - bu yüzden dışlanıyor.
+mosquitto/
+
+# İkisi de yalnızca requirements.txt + shared/ + kendi klasörünü COPY ediyor,
+# geri kalanı context'i şişirmekten başka işe yaramıyor.
+.git/
+data/
+docs/
+frontend/
+timescaledb/
+aqi-flink-job/
+flink-job/
+flink-taskmanager/
+energy/
+
+**/__pycache__/
+**/*.pyc
+.venv/
+venv/
+node_modules/
+
+# Secret'lar image'a sızmasın (env değişkenleri compose üzerinden geçiyor)
+.env
