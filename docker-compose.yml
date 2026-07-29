@@ -124,14 +124,9 @@ services:
       DB_NAME: energy_demo
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-    command: >
-      bash -c "
-      until (exec 3<>/dev/tcp/timescaledb/5432) 2>/dev/null; do sleep 1; done &&
-      until (exec 3<>/dev/tcp/flink-jobmanager/8081) 2>/dev/null; do sleep 1; done &&
-      flink run
-      -m flink-jobmanager:8081
-      -c com.energydemo.EnergyStreamJob
-      /app/energy-flink-job.jar"
+    # submit-job.sh bagimliliklari bekler ve ayni adli eski job'i iptal edip submit eder
+    # (bkz. flink-common/submit-job.sh) - boylece rebuild sonrasi deploy idempotent olur.
+    command: ["/app/submit-job.sh", "com.energydemo.EnergyStreamJob", "/app/energy-flink-job.jar", "Energy MQTT to TimescaleDB Job"]
     networks:
       - aqi-network
     depends_on:
@@ -153,14 +148,9 @@ services:
       DB_NAME: aqi_db
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-    command: >
-      bash -c "
-      until (exec 3<>/dev/tcp/timescaledb/5432) 2>/dev/null; do sleep 1; done &&
-      until (exec 3<>/dev/tcp/flink-jobmanager/8081) 2>/dev/null; do sleep 1; done &&
-      flink run
-      -m flink-jobmanager:8081
-      -c com.aqipipeline.AqiFlinkJob
-      /app/aqi-flink-job.jar"
+    # submit-job.sh bagimliliklari bekler ve ayni adli eski job'i iptal edip submit eder
+    # (bkz. flink-common/submit-job.sh) - boylece rebuild sonrasi deploy idempotent olur.
+    command: ["/app/submit-job.sh", "com.aqipipeline.AqiFlinkJob", "/app/aqi-flink-job.jar", "AQI MQTT to TimescaleDB Job"]
     networks:
       - aqi-network
     depends_on:

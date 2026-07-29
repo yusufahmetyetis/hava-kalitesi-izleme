@@ -21,3 +21,5 @@ FROM flink:1.19-scala_2.12-java11
 
 WORKDIR /app
 COPY --from=build /build/aqi-flink-job/target/aqi-flink-job.jar /app/aqi-flink-job.jar
+# Ortak submit script'i: bağımlılıkları bekler ve aynı adlı eski job'ı iptal edip submit eder
+COPY flink-common/submit-job.sh /app/submit-job.sh
