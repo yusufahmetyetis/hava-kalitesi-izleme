@@ -37,8 +37,6 @@ public class AqiReadingParser implements FlatMapFunction<String, AqiReading> {
             Instant measuredAt = OffsetDateTime.parse(node.get("measured_at").asText()).toInstant();
             int aqi = node.get("aqi").asInt();
 
-            LOG.debug("Parsed reading: station={} ({}) aqi={} measured_at={}", stationId, stationName, aqi, measuredAt);
-
             out.collect(new AqiReading(
                     stationId,
                     stationName,
@@ -55,7 +53,8 @@ public class AqiReadingParser implements FlatMapFunction<String, AqiReading> {
                     node.hasNonNull("co") ? node.get("co").asDouble() : null,
                     node.hasNonNull("temperature") ? node.get("temperature").asDouble() : null,
                     node.hasNonNull("humidity") ? node.get("humidity").asDouble() : null,
-                    node.hasNonNull("wind") ? node.get("wind").asDouble() : null));
+                    node.hasNonNull("wind") ? node.get("wind").asDouble() : null,
+                    raw));
         } catch (Exception e) {
             LOG.warn("Failed to parse message '{}': {}", raw, e.getMessage());
         }

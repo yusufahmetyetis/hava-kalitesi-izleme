@@ -21,13 +21,16 @@ public class AqiReading implements Serializable {
     private Double temperature;
     private Double humidity;
     private Double wind;
+    /** Ham MQTT JSON'u - raw_readings.raw_payload icin korunur (bkz. mqtt/CLAUDE.md). */
+    private String rawPayload;
 
     public AqiReading() {
     }
 
     public AqiReading(int stationId, String stationName, Double lat, Double lng, Instant measuredAt,
                        int aqi, String dominant, Double pm25, Double pm10, Double o3, Double no2,
-                       Double so2, Double co, Double temperature, Double humidity, Double wind) {
+                       Double so2, Double co, Double temperature, Double humidity, Double wind,
+                       String rawPayload) {
         this.stationId = stationId;
         this.stationName = stationName;
         this.lat = lat;
@@ -44,6 +47,7 @@ public class AqiReading implements Serializable {
         this.temperature = temperature;
         this.humidity = humidity;
         this.wind = wind;
+        this.rawPayload = rawPayload;
     }
 
     public int getStationId() {
@@ -108,6 +112,10 @@ public class AqiReading implements Serializable {
 
     public Double getWind() {
         return wind;
+    }
+
+    public String getRawPayload() {
+        return rawPayload;
     }
 
     @Override

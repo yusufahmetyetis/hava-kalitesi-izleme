@@ -74,3 +74,21 @@ CREATE TABLE IF NOT EXISTS energy_anomalies (
 
 SELECT create_hypertable('electricity_readings', 'measured_at', if_not_exists => TRUE);
 SELECT create_hypertable('gas_readings', 'measured_at', if_not_exists => TRUE);
+
+-- households seed: energy/publisher/publisher.py'deki HOUSEHOLDS listesiyle birebir aynı.
+--
+-- Gerekçe: ElectricityReadingSink/GasReadingSink gelen her okumanın household_code'unu bu
+-- tabloda arıyor ve bulamazsa "Unknown household 'HANE_00X', skipping" deyip atıyor. Tablo
+-- eskiden yalnızca energy/load_households.py ile dolduruluyordu; o script'in beklediği
+-- db_households.csv repoda bulunmadığı için her temiz kurulumda tablo boş kalıyor ve enerji
+-- hattı sessizce hiç veri yazmıyordu. Bu seed ile demo kutudan çıktığı gibi çalışıyor.
+--
+-- Zengin alanlar (ilçe, konum, cihaz sahipliği vb.) burada NULL; gerçek db_households.csv
+-- eldeyse load_households.py bu satırları ON CONFLICT ... DO UPDATE ile zenginleştirir.
+INSERT INTO households (household_code, description, person_count, has_ac) VALUES
+    ('HANE_001', 'Demo hane 1', 2, FALSE),
+    ('HANE_002', 'Demo hane 2', 4, TRUE),
+    ('HANE_003', 'Demo hane 3', 1, FALSE),
+    ('HANE_004', 'Demo hane 4', 5, TRUE),
+    ('HANE_005', 'Demo hane 5', 3, FALSE)
+ON CONFLICT (household_code) DO NOTHING;

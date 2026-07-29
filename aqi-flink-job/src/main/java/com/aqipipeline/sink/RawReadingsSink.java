@@ -18,6 +18,11 @@ import java.sql.Types;
  * (station_id, measured_at) for the ON CONFLICT dedup, since WAQI republishes
  * the same station/measured_at pair across multiple poll cycles whenever its
  * own upstream data hasn't refreshed yet.
+ *
+ * <p>raw_payload: WAQI'nin gönderdiği ham JSON aynen saklanır. mqtt/CLAUDE.md bu alanı
+ * açıkça koruma altına alıyor ("ileride ham veriye tekrar bakabilmek için önemli"); parse
+ * mantığında sonradan bir hata bulunursa ya da WAQI'nin bugün okumadığımız bir alanını
+ * kullanmak istersek, geçmişe dönüp buradan düzeltebilmemiz gerekiyor.
  */
 public class RawReadingsSink extends RichSinkFunction<AqiReading> {
 
@@ -42,8 +47,9 @@ public class RawReadingsSink extends RichSinkFunction<AqiReading> {
         connection = DriverManager.getConnection(jdbcUrl, user, password);
         insertStmt = connection.prepareStatement(
                 "INSERT INTO raw_readings " +
-                        "(station_id, measured_at, aqi, dominant, pm25, pm10, o3, no2, so2, co, temperature, humidity, wind) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                        "(station_id, measured_at, aqi, dominant, pm25, pm10, o3, no2, so2, co, " +
+                        "temperature, humidity, wind, station_name, raw_payload) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb) " +
                         "ON CONFLICT (station_id, measured_at) DO NOTHING");
     }
 
@@ -63,6 +69,8 @@ public class RawReadingsSink extends RichSinkFunction<AqiReading> {
             setNullableDouble(11, reading.getTemperature());
             setNullableDouble(12, reading.getHumidity());
             setNullableDouble(13, reading.getWind());
+            insertStmt.setString(14, reading.getStationName());
+            insertStmt.setString(15, reading.getRawPayload());
 
             int inserted = insertStmt.executeUpdate();
             if (inserted > 0) {

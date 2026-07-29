@@ -63,22 +63,29 @@ def main():
     )
     cur = conn.cursor()
 
+    # 02_energy_schema.sql artık 5 demo hanesini seed'liyor (yoksa sink'ler "Unknown
+    # household" deyip her okumayı atıyordu). DO NOTHING kalsaydı gerçek CSV o seed
+    # satırlarını hiçbir zaman geçemez, sessizce yok sayılırdı — bu yüzden upsert:
+    # CSV eldeyse seed'in boş bıraktığı zengin alanları doldurur.
+    updatable = [c for c in COLUMNS if c != "household_code"]
     insert_sql = f"""
         INSERT INTO households ({', '.join(COLUMNS)})
         VALUES ({', '.join(['%s'] * len(COLUMNS))})
-        ON CONFLICT (household_code) DO NOTHING
+        ON CONFLICT (household_code) DO UPDATE SET
+        {', '.join(f'{c} = EXCLUDED.{c}' for c in updatable)}
     """
 
-    inserted = 0
+    # upsert olduğu için rowcount hem yeni satırı hem güncellenen satırı sayar
+    affected = 0
     for row in rows:
         values = [parse_value(col, row[col]) for col in COLUMNS]
         cur.execute(insert_sql, values)
-        inserted += cur.rowcount
+        affected += cur.rowcount
 
     conn.commit()
     cur.close()
     conn.close()
-    print(f"{len(rows)} satır okundu, {inserted} yeni satır eklendi.")
+    print(f"{len(rows)} satır okundu, {affected} satır eklendi/güncellendi.")
 
 
 if __name__ == "__main__":
