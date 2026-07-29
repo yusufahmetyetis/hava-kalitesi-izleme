@@ -3,15 +3,17 @@
 # host kullanıcısı okuyamaz ve context hazırlanırken build patlar - bu yüzden dışlanıyor.
 mosquitto/
 
-# İkisi de yalnızca requirements.txt + shared/ + kendi klasörünü COPY ediyor,
-# geri kalanı context'i şişirmekten başka işe yaramıyor.
+# Aşağıdakiler kök context'i kullanan hiçbir Dockerfile tarafından COPY edilmiyor,
+# context'i şişirmekten başka işe yaramıyorlar.
+#
+# DİKKAT: flink-common/, flink-job/ ve aqi-flink-job/ BURAYA EKLENMEMELİ. İki Flink
+# job'ı flink-common modülüne bağımlı olduğundan build context'leri repo kökü
+# (docker-compose.yml: context: .) ve kendi kaynaklarını kökten COPY ediyorlar.
 .git/
 data/
 docs/
 frontend/
 timescaledb/
-aqi-flink-job/
-flink-job/
 flink-taskmanager/
 energy/
 

@@ -9,27 +9,12 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 
 public class WindowAggregateSink extends RichSinkFunction<WindowAggregate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(WindowAggregateSink.class);
-
-    private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE IF NOT EXISTS aqi_window_aggregates (" +
-                    "id SERIAL PRIMARY KEY, " +
-                    "station_id INTEGER NOT NULL, " +
-                    "station_name TEXT, " +
-                    "window_start TIMESTAMPTZ NOT NULL, " +
-                    "window_end TIMESTAMPTZ NOT NULL, " +
-                    "avg_aqi NUMERIC(6, 2) NOT NULL, " +
-                    "avg_pm25 NUMERIC(6, 2), " +
-                    "avg_pm10 NUMERIC(6, 2), " +
-                    "max_aqi INTEGER NOT NULL, " +
-                    "sample_count INTEGER NOT NULL, " +
-                    "created_at TIMESTAMPTZ DEFAULT now())";
 
     private final String jdbcUrl;
     private final String user;
@@ -48,9 +33,6 @@ public class WindowAggregateSink extends RichSinkFunction<WindowAggregate> {
     public void open(Configuration parameters) throws Exception {
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(jdbcUrl, user, password);
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(CREATE_TABLE_SQL);
-        }
         insertStmt = connection.prepareStatement(
                 "INSERT INTO aqi_window_aggregates " +
                         "(station_id, station_name, window_start, window_end, avg_aqi, avg_pm25, avg_pm10, max_aqi, sample_count) " +

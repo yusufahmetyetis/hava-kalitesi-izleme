@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
 
@@ -23,31 +22,6 @@ import java.sql.Types;
 public class RawReadingsSink extends RichSinkFunction<AqiReading> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RawReadingsSink.class);
-
-    private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE IF NOT EXISTS raw_readings (" +
-                    "id BIGSERIAL, " +
-                    "station_id INTEGER REFERENCES stations(id), " +
-                    "station_name TEXT, " +
-                    "measured_at TIMESTAMPTZ NOT NULL, " +
-                    "ingested_at TIMESTAMPTZ DEFAULT now(), " +
-                    "pm25 DOUBLE PRECISION, " +
-                    "pm10 DOUBLE PRECISION, " +
-                    "o3 DOUBLE PRECISION, " +
-                    "no2 DOUBLE PRECISION, " +
-                    "so2 DOUBLE PRECISION, " +
-                    "co DOUBLE PRECISION, " +
-                    "temperature DOUBLE PRECISION, " +
-                    "humidity DOUBLE PRECISION, " +
-                    "wind DOUBLE PRECISION, " +
-                    "aqi INTEGER, " +
-                    "dominant TEXT, " +
-                    "raw_payload JSONB, " +
-                    "PRIMARY KEY (id, measured_at))";
-
-    private static final String CREATE_UNIQUE_INDEX_SQL =
-            "CREATE UNIQUE INDEX IF NOT EXISTS raw_readings_station_measured_uniq " +
-                    "ON raw_readings (station_id, measured_at)";
 
     private final String jdbcUrl;
     private final String user;
@@ -66,10 +40,6 @@ public class RawReadingsSink extends RichSinkFunction<AqiReading> {
     public void open(Configuration parameters) throws Exception {
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(jdbcUrl, user, password);
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(CREATE_TABLE_SQL);
-            stmt.execute(CREATE_UNIQUE_INDEX_SQL);
-        }
         insertStmt = connection.prepareStatement(
                 "INSERT INTO raw_readings " +
                         "(station_id, measured_at, aqi, dominant, pm25, pm10, o3, no2, so2, co, temperature, humidity, wind) " +

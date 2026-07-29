@@ -3,7 +3,7 @@ package com.aqipipeline;
 import com.aqipipeline.model.AnomalyEvent;
 import com.aqipipeline.model.AqiReading;
 import com.aqipipeline.model.WindowAggregate;
-import com.aqipipeline.mqtt.MqttSourceFunction;
+import com.hkizleme.flink.mqtt.MqttSourceFunction;
 import com.aqipipeline.parser.AqiReadingParser;
 import com.aqipipeline.process.AnomalyDetector;
 import com.aqipipeline.process.WindowAggregator;
@@ -34,7 +34,8 @@ public class AqiFlinkJob {
         env.setParallelism(1);
 
         DataStream<String> rawMessages = env.addSource(
-                new MqttSourceFunction(mqttBroker, mqttPort, new String[]{"air_quality/#"}),
+                new MqttSourceFunction(mqttBroker, mqttPort, new String[]{"air_quality/#"},
+                        "aqi-flink-mqtt-source-"),
                 "mqtt-source");
 
         SingleOutputStreamOperator<AqiReading> readings = rawMessages

@@ -1,4 +1,4 @@
-package com.aqipipeline.mqtt;
+package com.hkizleme.flink.mqtt;
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -18,7 +18,11 @@ import java.util.concurrent.TimeUnit;
  * Bridges an MQTT broker into the DataStream API. The paho callback thread pushes
  * payloads onto a queue; run() drains that queue under the checkpoint lock.
  * Non-parallel (single broker connection) and not checkpointed, matching the
- * at-least-effort semantics of the energy demo job.
+ * at-least-effort semantics of both stream jobs.
+ *
+ * <p>energy (com.energydemo) ve aqi (com.aqipipeline) job'ları bu sınıfın birbirinin
+ * kopyası iki ayrı sürümünü taşıyordu; tek fark clientId önekiydi. Önek artık constructor
+ * parametresi, böylece iki job broker loglarında hâlâ ayrı görünüyor.
  */
 public class MqttSourceFunction implements SourceFunction<String> {
 
@@ -27,15 +31,17 @@ public class MqttSourceFunction implements SourceFunction<String> {
     private final String broker;
     private final int port;
     private final String[] topicFilters;
+    private final String clientIdPrefix;
 
     private transient volatile boolean running;
     private transient BlockingQueue<String> queue;
     private transient MqttClient client;
 
-    public MqttSourceFunction(String broker, int port, String[] topicFilters) {
+    public MqttSourceFunction(String broker, int port, String[] topicFilters, String clientIdPrefix) {
         this.broker = broker;
         this.port = port;
         this.topicFilters = topicFilters;
+        this.clientIdPrefix = clientIdPrefix;
     }
 
     @Override
@@ -55,7 +61,7 @@ public class MqttSourceFunction implements SourceFunction<String> {
     }
 
     private void connectWithRetry() throws InterruptedException {
-        String clientId = "aqi-flink-mqtt-source-" + UUID.randomUUID();
+        String clientId = clientIdPrefix + UUID.randomUUID();
         while (running) {
             try {
                 client = new MqttClient("tcp://" + broker + ":" + port, clientId, new MemoryPersistence());

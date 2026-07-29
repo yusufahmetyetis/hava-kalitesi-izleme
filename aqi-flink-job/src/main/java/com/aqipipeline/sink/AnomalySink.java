@@ -9,24 +9,11 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Timestamp;
 
 public class AnomalySink extends RichSinkFunction<AnomalyEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AnomalySink.class);
-
-    private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE IF NOT EXISTS aqi_anomalies (" +
-                    "id SERIAL PRIMARY KEY, " +
-                    "station_id INTEGER NOT NULL, " +
-                    "station_name TEXT, " +
-                    "measured_at TIMESTAMPTZ NOT NULL, " +
-                    "actual_aqi INTEGER NOT NULL, " +
-                    "expected_aqi NUMERIC(6, 2) NOT NULL, " +
-                    "deviation_pct NUMERIC(6, 2) NOT NULL, " +
-                    "severity VARCHAR(8) NOT NULL, " +
-                    "detected_at TIMESTAMPTZ NOT NULL DEFAULT now())";
 
     private final String jdbcUrl;
     private final String user;
@@ -45,9 +32,6 @@ public class AnomalySink extends RichSinkFunction<AnomalyEvent> {
     public void open(Configuration parameters) throws Exception {
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(jdbcUrl, user, password);
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(CREATE_TABLE_SQL);
-        }
         insertStmt = connection.prepareStatement(
                 "INSERT INTO aqi_anomalies " +
                         "(station_id, station_name, measured_at, actual_aqi, expected_aqi, deviation_pct, severity) " +

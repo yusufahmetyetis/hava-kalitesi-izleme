@@ -4,7 +4,7 @@ import com.energydemo.model.AnomalyEvent;
 import com.energydemo.model.EnergyReading;
 import com.energydemo.model.ReadingType;
 import com.energydemo.model.WindowAggregate;
-import com.energydemo.mqtt.MqttSourceFunction;
+import com.hkizleme.flink.mqtt.MqttSourceFunction;
 import com.energydemo.parser.EnergyReadingParser;
 import com.energydemo.process.AnomalyDetector;
 import com.energydemo.process.WindowAggregator;
@@ -38,7 +38,8 @@ public class EnergyStreamJob {
         env.setParallelism(1);
 
         DataStream<String> rawMessages = env.addSource(
-                new MqttSourceFunction(mqttBroker, mqttPort, new String[]{"energy/+/electricity", "energy/+/gas"}),
+                new MqttSourceFunction(mqttBroker, mqttPort, new String[]{"energy/+/electricity", "energy/+/gas"},
+                        "flink-mqtt-source-"),
                 "mqtt-source");
 
         SingleOutputStreamOperator<EnergyReading> readings = rawMessages

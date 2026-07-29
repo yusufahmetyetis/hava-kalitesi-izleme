@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS gas_readings (
     PRIMARY KEY (id, measured_at)
 );
 
--- kept identical to the CREATE_TABLE_SQL in energy-demo's WindowAggregateSink.java
+-- flink-job's WindowAggregateSink writes here; the sink no longer creates the table itself
 CREATE TABLE IF NOT EXISTS energy_window_aggregates (
     id SERIAL PRIMARY KEY,
     household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE,
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS energy_window_aggregates (
     created_at TIMESTAMP DEFAULT now()
 );
 
--- kept identical to the CREATE_TABLE_SQL in energy-demo's AnomalySink.java
+-- flink-job's AnomalySink writes here; the sink no longer creates the table itself
 CREATE TABLE IF NOT EXISTS energy_anomalies (
     id SERIAL PRIMARY KEY,
     household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE,

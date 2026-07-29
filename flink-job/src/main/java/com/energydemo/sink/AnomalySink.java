@@ -9,25 +9,12 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Map;
 
 public class AnomalySink extends RichSinkFunction<AnomalyEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AnomalySink.class);
-
-    private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE IF NOT EXISTS energy_anomalies (" +
-                    "id SERIAL PRIMARY KEY, " +
-                    "household_id INTEGER NOT NULL REFERENCES households(id) ON DELETE CASCADE, " +
-                    "metric_key VARCHAR(50) NOT NULL, " +
-                    "reading_type VARCHAR(11) NOT NULL, " +
-                    "measured_at TIMESTAMP NOT NULL, " +
-                    "actual_value NUMERIC(10, 4) NOT NULL, " +
-                    "expected_value NUMERIC(10, 4) NOT NULL, " +
-                    "deviation_pct NUMERIC(6, 2) NOT NULL, " +
-                    "created_at TIMESTAMP DEFAULT now())";
 
     private final String jdbcUrl;
     private final String user;
@@ -47,9 +34,6 @@ public class AnomalySink extends RichSinkFunction<AnomalyEvent> {
     public void open(Configuration parameters) throws Exception {
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(jdbcUrl, user, password);
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute(CREATE_TABLE_SQL);
-        }
         householdMap = HouseholdLookup.load(connection);
         insertStmt = connection.prepareStatement(
                 "INSERT INTO energy_anomalies " +

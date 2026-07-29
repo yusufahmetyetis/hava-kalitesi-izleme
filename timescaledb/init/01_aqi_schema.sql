@@ -63,7 +63,7 @@ SELECT create_hypertable('processed_readings', 'measured_at', if_not_exists => T
 -- required for aqi-flink-job's RawReadingsSink.java ON CONFLICT (station_id, measured_at) DO NOTHING
 CREATE UNIQUE INDEX IF NOT EXISTS raw_readings_station_measured_uniq ON raw_readings (station_id, measured_at);
 
--- kept identical to the CREATE_TABLE_SQL in aqi-flink-job's WindowAggregateSink.java
+-- aqi-flink-job's WindowAggregateSink writes here; the sink no longer creates the table itself
 CREATE TABLE IF NOT EXISTS aqi_window_aggregates (
     id SERIAL,
     station_id INTEGER NOT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS aqi_window_aggregates (
     PRIMARY KEY (id, window_start)
 );
 
--- kept identical to the CREATE_TABLE_SQL in aqi-flink-job's AnomalySink.java
+-- aqi-flink-job's AnomalySink writes here; the sink no longer creates the table itself
 CREATE TABLE IF NOT EXISTS aqi_anomalies (
     id SERIAL,
     station_id INTEGER NOT NULL,
