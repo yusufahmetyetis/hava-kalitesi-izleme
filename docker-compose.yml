@@ -186,5 +186,11 @@ services:
       - ./data-generator:/app
       - ./data:/data
     command: tail -f /dev/null
+    environment:
+      DB_HOST: timescaledb
+      DB_PORT: "5432"
+      DB_NAME: energy_demo
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     networks:
       - aqi-network
