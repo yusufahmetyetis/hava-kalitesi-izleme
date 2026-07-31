@@ -35,7 +35,9 @@ export async function fetchCamsGrid() {
   const params = new URLSearchParams({
     latitude,
     longitude,
-    hourly: "european_aqi",
+    // us_aqi: füzyonda gerçek istasyon okumaları ABD AQI ölçeğinde (WAQI); model de aynı ölçekte
+    // olmalı, yoksa CamsHeatmapLayer iki farklı standardı (EU vs ABD) tek yüzeyde harmanlıyordu.
+    hourly: "us_aqi",
     forecast_days: "1",
     timezone: "Europe/Istanbul",
   });
@@ -57,7 +59,7 @@ export async function fetchCamsGrid() {
     return GRID_POINTS.map((point, i) => ({
       lat: point.lat,
       lng: point.lon,
-      aqi: json[i]?.hourly?.european_aqi?.[index] ?? null,
+      aqi: json[i]?.hourly?.us_aqi?.[index] ?? null,
     }));
   } catch (err) {
     console.error("CAMS grid verisi alınamadı:", err);

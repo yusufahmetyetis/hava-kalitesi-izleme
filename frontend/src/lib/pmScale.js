@@ -1,29 +1,17 @@
-// EPA 24-saatlik AQI kategori konsantrasyon sınırları (µg/m³), yalnızca renk-bandı skalası
-// olarak kullanılır (AQI alt-endeksi hesaplanmaz). Renkler harita paletiyle uyumlu.
-const PM25_BREAKS = [
-  [9, "#009966"],
-  [35.4, "#ffde33"],
-  [55.4, "#ff9933"],
-  [125.4, "#cc0033"],
-];
-const PM10_BREAKS = [
-  [54, "#009966"],
-  [154, "#ffde33"],
-  [254, "#ff9933"],
-  [354, "#cc0033"],
-];
-const OVER = "#660099"; // en üst band (Çok Sağlıksız)
+// raw_readings.pm25 / pm10 sütunları WAQI iaqi.*.v değerini tutar; bunlar µg/m³ KONSANTRASYON
+// DEĞİL, AQI ALT-ENDEKSİ'dir (0–500 ölçeği). Bu yüzden renklendirme de AQI kategori eşikleriyle
+// yapılmalı — tek kaynak lib/aqiUtils.js (haritadaki AQI paletiyle birebir aynı, PM2.5/PM10 aynı
+// ölçekte olduğu için ayrı eşik tablosuna gerek yok).
+//
+// Eskiden burada µg/m³ konsantrasyon bantları (9 / 35.4 / 55.4 …) vardı: AQI ölçekli bir değeri
+// konsantrasyon eşiğiyle boyayıp takvimi sistematik olarak fazla kötü (kronik kırmızı) gösteriyordu.
+import { getAQIColor } from "./aqiUtils.js";
 
-function bandColor(value, breaks) {
+// metric parametresi çağrı uyumu için korunuyor; PM2.5 ve PM10 aynı AQI ölçeğinde olduğu için
+// renk yalnızca değere bağlı.
+export function pmColor(_metric, value) {
   if (value === null || value === undefined) return null;
-  for (const [threshold, color] of breaks) {
-    if (value <= threshold) return color;
-  }
-  return OVER;
-}
-
-export function pmColor(metric, value) {
-  return bandColor(value, metric === "pm10" ? PM10_BREAKS : PM25_BREAKS);
+  return getAQIColor(value);
 }
 
 // Anomali oranı (anomaly_count / evaluated_count). evaluated_count 0 ise "değerlendirilmedi"

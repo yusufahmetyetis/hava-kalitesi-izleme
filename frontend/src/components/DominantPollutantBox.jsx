@@ -18,7 +18,8 @@ export default function DominantPollutantBox({ reading }) {
     >
       <span className="dominant-label">Baskın kirletici: {label}</span>
       <span className="dominant-value">
-        {value == null ? "-" : `${value} µg/m³`}
+        {/* WAQI iaqi.*.v = AQI alt-endeksi (0–500), µg/m³ konsantrasyon değil */}
+        {value == null ? "-" : `${value} AQI`}
       </span>
     </div>
   );

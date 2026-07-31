@@ -24,11 +24,11 @@ export default function CityAqiWidget() {
             <span
               className="city-aqi-badge"
               style={{
-                background: aqiColor(data.european_aqi),
-                color: aqiTextColor(data.european_aqi),
+                background: aqiColor(data.us_aqi),
+                color: aqiTextColor(data.us_aqi),
               }}
             >
-              {data.european_aqi ?? "?"}
+              {data.us_aqi ?? "?"}
             </span>
             <span className="city-aqi-note">
               CAMS modeli tahmini — ölçüm değildir
