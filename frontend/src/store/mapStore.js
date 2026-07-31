@@ -32,6 +32,7 @@ export const useMapStore = create((set) => ({
     hexbin: false,
     terrain: true,
     camsHeatmap: false,
+    aod: false,
   },
   setLayerVisible: (key, visible) =>
     set((s) => ({ layers: { ...s.layers, [key]: visible } })),

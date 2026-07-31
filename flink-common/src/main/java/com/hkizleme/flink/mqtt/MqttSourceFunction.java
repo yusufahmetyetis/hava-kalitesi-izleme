@@ -1,6 +1,7 @@
 package com.hkizleme.flink.mqtt;
 
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -65,7 +66,7 @@ public class MqttSourceFunction implements SourceFunction<String> {
         while (running) {
             try {
                 client = new MqttClient("tcp://" + broker + ":" + port, clientId, new MemoryPersistence());
-                client.setCallback(new SourceMqttCallback(queue));
+                client.setCallback(new SourceMqttCallback(client, topicFilters, queue));
 
                 MqttConnectOptions options = new MqttConnectOptions();
                 options.setCleanSession(true);
@@ -98,11 +99,36 @@ public class MqttSourceFunction implements SourceFunction<String> {
         }
     }
 
-    private static class SourceMqttCallback implements org.eclipse.paho.client.mqttv3.MqttCallback {
+    private static class SourceMqttCallback implements MqttCallbackExtended {
+        private final MqttClient client;
+        private final String[] topicFilters;
         private final BlockingQueue<String> queue;
 
-        SourceMqttCallback(BlockingQueue<String> queue) {
+        SourceMqttCallback(MqttClient client, String[] topicFilters, BlockingQueue<String> queue) {
+            this.client = client;
+            this.topicFilters = topicFilters;
             this.queue = queue;
+        }
+
+        // paho her başarılı (yeniden) bağlanmada tetikler. cleanSession=true olduğu için
+        // broker, otomatik reconnect'te eski abonelikleri unutur; burada yeniden abone
+        // olmazsak soket geri gelir, job RUNNING görünür ama messageArrived bir daha hiç
+        // çağrılmaz (sessiz ölüm — broker restart/makine uykusu sonrası tüm akış durur).
+        // İlk bağlantının subscribe'ı connectWithRetry içinde yapıldığından burada yalnızca
+        // reconnect durumunu ele alıyoruz; çalışan ilk-bağlantı yolu değişmiyor.
+        @Override
+        public void connectComplete(boolean reconnect, String serverURI) {
+            if (!reconnect) {
+                return;
+            }
+            for (String filter : topicFilters) {
+                try {
+                    client.subscribe(filter);
+                } catch (MqttException e) {
+                    LOG.warn("MQTT resubscribe failed for {}: {}", filter, e.getMessage());
+                }
+            }
+            LOG.info("MQTT reconnected to {}, resubscribed to {}", serverURI, String.join(", ", topicFilters));
         }
 
         @Override
