@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import Date, cast, exists, func, select
+from sqlalchemy import Date, cast, exists, func, or_, select
 from sqlalchemy.orm import Session
 
 from shared.aqi import category
-from shared.models import AqiAnomaly, RawReading, Station
+from shared.models import AqiAnomaly, FilteredReading, RawReading, Station
 
 from ..schemas.reading import (
     CalendarDayOut,
@@ -27,16 +27,28 @@ LEGACY_ANOMALY_AQI_THRESHOLD = 150
 
 
 def _anomaly_exists_subquery():
-    # Fiziksel JOIN yerine EXISTS: aqi_anomalies'te (station_id, measured_at) üzerinde unique
-    # constraint yok (raw_readings'ten farklı) — bir JOIN, olası bir mükerrer anomali satırında
-    # raw_readings sonuçlarını çoğaltır (get_history'de tekrarlanan noktalar, get_calendar'da
-    # şişmiş sayaçlar). EXISTS her zaman tek bir bool döner, çoğalma riski yok.
-    return exists(
+    # Anomali iki AYRI kaynakta tutuluyor ve zaman olarak birbirini tamamlıyor:
+    #   - aqi_anomalies (EMA, ema_v1)      -> yalnızca CANLI Flink akışı yazar
+    #   - filtered_readings.is_anomaly     -> yalnızca BACKFILL (zscore_v1) yazar
+    # Tek kaynağa bakmak zaman ekseninin yarısını "anomali yok" gösterir (canlı okunursa geçmiş
+    # yıl, geçmiş okunursa canlı dönem ölü kalır). Bu yüzden İKİSİNİN BİRLEŞİMİNE bakıyoruz.
+    # Fiziksel JOIN yerine EXISTS: aqi_anomalies'te (station_id, measured_at) unique constraint
+    # yok; JOIN olası mükerrer anomali satırında raw_readings'i çoğaltırdı. EXISTS her zaman tek
+    # bir bool döner, çoğalma riski yok.
+    live = exists(
         select(AqiAnomaly.id).where(
             AqiAnomaly.station_id == RawReading.station_id,
             AqiAnomaly.measured_at == RawReading.measured_at,
         )
     )
+    historical = exists(
+        select(FilteredReading.id).where(
+            FilteredReading.station_id == RawReading.station_id,
+            FilteredReading.measured_at == RawReading.measured_at,
+            FilteredReading.is_anomaly.is_(True),
+        )
+    )
+    return or_(live, historical)
 
 
 def list_stations(db: Session) -> list[StationOut]:
@@ -143,9 +155,10 @@ def get_calendar(db: Session, station_id: int) -> list[CalendarDayOut]:
             func.percentile_cont(0.5).within_group(RawReading.pm10.asc()),
             func.percentile_cont(0.75).within_group(RawReading.pm10.asc()),
             func.count().label("reading_count"),
-            # aqi_anomalies (canlı EMA dedektörü) filtered_readings'teki gibi her okuma için
-            # bir satır tutmuyor, sadece gerçek anomalileri - "değerlendirilen" kavramı artık
-            # "okunan" ile aynı (her ham okuma Flink'te anomali dedektöründen geçiyor).
+            # evaluated_count = reading_count (yaklaşık): canlı dönemde her ham okuma Flink EMA
+            # dedektöründen geçer, backfill döneminde ise her okumanın bir filtered_readings satırı
+            # vardır. is_anomaly_col iki kaynağın birleşimine baktığı için anomaly_count her iki
+            # dönemi de doğru sayar (bkz. _anomaly_exists_subquery).
             func.count().label("evaluated_count"),
             func.count().filter(is_anomaly_col).label("anomaly_count"),
         )

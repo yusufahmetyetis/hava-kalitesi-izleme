@@ -16,7 +16,8 @@ export default function PollutantCards({ reading }) {
             <div className="pollutant-name">{p.name}</div>
             <div className="pollutant-value">
               {value == null ? "-" : value}
-              <span className="pollutant-unit"> µg/m³</span>
+              {/* WAQI iaqi.*.v = AQI alt-endeksi (0–500), µg/m³ konsantrasyon değil */}
+              <span className="pollutant-unit"> AQI</span>
             </div>
           </div>
         );

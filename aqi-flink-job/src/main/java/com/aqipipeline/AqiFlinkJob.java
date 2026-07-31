@@ -6,6 +6,7 @@ import com.aqipipeline.model.WindowAggregate;
 import com.hkizleme.flink.mqtt.MqttSourceFunction;
 import com.aqipipeline.parser.AqiReadingParser;
 import com.aqipipeline.process.AnomalyDetector;
+import com.aqipipeline.process.MeasuredAtDeduplicator;
 import com.aqipipeline.process.WindowAggregator;
 import com.aqipipeline.sink.AnomalySink;
 import com.aqipipeline.sink.RawReadingsSink;
@@ -42,16 +43,25 @@ public class AqiFlinkJob {
                 .flatMap(new AqiReadingParser())
                 .name("parse-and-filter");
 
-        // Keep the "stations" table alive - aqi-subscriber, its previous owner, is gone
-        readings.addSink(new StationSink(jdbcUrl, dbUser, dbPassword)).name("station-sink");
+        // WAQI ayni measured_at'i her poll'da (5 dk) yeniden yayinliyor. Fan-out'tan ONCE
+        // tekillestir ki asagidaki uc kol da (station/raw sink, pencere, anomali) her fiziksel
+        // olcumu tek kez gorsun - yoksa anomali EMA'si ayni degerle defalarca guncellenip bozuluyor
+        // ve mukerrer anomali satiri yaziliyordu (bkz. MeasuredAtDeduplicator).
+        SingleOutputStreamOperator<AqiReading> deduped = readings
+                .keyBy(AqiReading::getStationId)
+                .process(new MeasuredAtDeduplicator())
+                .name("dedup-by-measured-at");
 
-        readings.addSink(new RawReadingsSink(jdbcUrl, dbUser, dbPassword))
+        // Keep the "stations" table alive - aqi-subscriber, its previous owner, is gone
+        deduped.addSink(new StationSink(jdbcUrl, dbUser, dbPassword)).name("station-sink");
+
+        deduped.addSink(new RawReadingsSink(jdbcUrl, dbUser, dbPassword))
                 .name("raw-readings-sink");
 
         // 5-minute tumbling window aggregation per station. Processing time, not event time:
         // WAQI's own measured_at only advances roughly hourly, so an event-time watermark tied
         // to it would stall and windows would never close even though we poll every 5 minutes.
-        DataStream<WindowAggregate> windowAggregates = readings
+        DataStream<WindowAggregate> windowAggregates = deduped
                 .keyBy(AqiReading::getStationId)
                 .window(TumblingProcessingTimeWindows.of(Time.minutes(5)))
                 .aggregate(new WindowAggregator.Aggregate(), new WindowAggregator.ToWindowAggregate())
@@ -62,7 +72,7 @@ public class AqiFlinkJob {
                 .name("window-aggregate-sink");
 
         // Anomaly detection: keyed moving average with side-output for deviations
-        SingleOutputStreamOperator<AqiReading> anomalyProcessed = readings
+        SingleOutputStreamOperator<AqiReading> anomalyProcessed = deduped
                 .keyBy(AqiReading::getStationId)
                 .process(new AnomalyDetector())
                 .name("anomaly-detection");

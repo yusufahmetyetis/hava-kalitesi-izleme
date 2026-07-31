@@ -11,8 +11,10 @@ import java.io.Serializable;
 import java.time.Instant;
 
 /**
- * Averages AQI/PM2.5/PM10 per station inside a 5-minute tumbling event-time window
- * (matches the WAQI feed's ~5 minute update cadence).
+ * Averages AQI/PM2.5/PM10 per station inside a 5-minute tumbling PROCESSING-time window.
+ * (Processing time, not event time: WAQI's measured_at only advances ~hourly, so an event-time
+ * watermark tied to it would stall and windows would never close even though the publisher polls
+ * every 5 minutes. See AqiFlinkJob for the full rationale.)
  */
 public class WindowAggregator {
 

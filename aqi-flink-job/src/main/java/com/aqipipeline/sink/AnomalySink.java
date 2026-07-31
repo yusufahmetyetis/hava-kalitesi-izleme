@@ -32,10 +32,17 @@ public class AnomalySink extends RichSinkFunction<AnomalyEvent> {
     public void open(Configuration parameters) throws Exception {
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(jdbcUrl, user, password);
+        // Idempotent insert: ayni (station_id, measured_at) icin ikinci bir anomali satiri yazma.
+        // Normalde tekillestirme MeasuredAtDeduplicator'da yapiliyor; bu WHERE NOT EXISTS, Flink
+        // checkpointing kapali oldugundan job RESTART'inda dedup state sifirlanip ayni olcumun bir
+        // kez daha gecebilecegi durumu yakalayan DB backstop'u. (aqi_anomalies detected_at ile
+        // partitionlanmis bir hypertable oldugu icin (station_id, measured_at) UNIQUE index
+        // konulamiyor - TimescaleDB unique index'in partition kolonunu icermesini sart kosar.)
         insertStmt = connection.prepareStatement(
                 "INSERT INTO aqi_anomalies " +
                         "(station_id, station_name, measured_at, actual_aqi, expected_aqi, deviation_pct, severity) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        "SELECT ?, ?, ?, ?, ?, ?, ? " +
+                        "WHERE NOT EXISTS (SELECT 1 FROM aqi_anomalies WHERE station_id = ? AND measured_at = ?)");
     }
 
     @Override
@@ -48,6 +55,9 @@ public class AnomalySink extends RichSinkFunction<AnomalyEvent> {
             insertStmt.setDouble(5, event.getExpectedAqi());
             insertStmt.setDouble(6, event.getDeviationPct());
             insertStmt.setString(7, event.getSeverity());
+            // WHERE NOT EXISTS parametreleri (idempotent insert backstop):
+            insertStmt.setInt(8, event.getStationId());
+            insertStmt.setTimestamp(9, Timestamp.from(event.getMeasuredAt()));
             insertStmt.executeUpdate();
             LOG.info("aqi_anomalies ⚠ station={} severity={} actual={} expected={} deviation={}%",
                     event.getStationId(), event.getSeverity(), event.getActualAqi(),

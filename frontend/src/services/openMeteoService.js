@@ -6,7 +6,10 @@ export async function fetchOpenMeteoAirQuality(lat, lon) {
   const params = new URLSearchParams({
     latitude: lat,
     longitude: lon,
-    hourly: "pm2_5,pm10,nitrogen_dioxide,ozone,european_aqi",
+    // us_aqi (european_aqi DEĞİL): istasyon marker'ları WAQI = ABD AQI ölçeğinde; EU AQI farklı
+    // bir ölçek (0-20-40-60-80-100) olduğu için ABD paletiyle renklendirilince kirliliği yanlış
+    // (olduğundan iyi) gösteriyordu. Tek ölçekte kalmak için us_aqi çekiliyor.
+    hourly: "pm2_5,pm10,nitrogen_dioxide,ozone,us_aqi",
     timezone: "Europe/Istanbul",
     forecast_days: "1",
   });
@@ -27,7 +30,7 @@ export async function fetchOpenMeteoAirQuality(lat, lon) {
 
     return {
       time: hourly.time[index],
-      european_aqi: hourly.european_aqi?.[index] ?? null,
+      us_aqi: hourly.us_aqi?.[index] ?? null,
       pm2_5: hourly.pm2_5?.[index] ?? null,
       pm10: hourly.pm10?.[index] ?? null,
       nitrogen_dioxide: hourly.nitrogen_dioxide?.[index] ?? null,
