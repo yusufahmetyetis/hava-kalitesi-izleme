@@ -84,30 +84,6 @@ docker run --rm --network hava-kalitesi-izleme_aqi-network \
 # Sorun yoksa --dry-run'ı kaldırıp gerçekten çalıştır
 ```
 
-## Sık karşılaşılan sorunlar
-
-**timescaledb hemen kapanıyor, log'da "superuser password is not specified"**
-`.env`'de `DB_PASSWORD` boş. Doldur, sonra `docker compose up -d`.
-
-**Frontend 502 veriyor**
-Backend henüz ayağa kalkmamış olabilir; `docker compose logs backend` ile bak.
-(Backend'in IP'si değişince oluşan eski 502 sorunu `frontend/nginx.conf`'taki `resolver`
-ayarıyla çözüldü, artık kendi kendine toparlanır.)
-
-**Dashboard'da bazı ilçeler iki kez görünüyor**
-SİM ve WAQI aynı ilçeyi farklı istasyon ID'leriyle yayınlıyor (örn. Üsküdar, Kâğıthane).
-Bilinen durum, henüz eşleştirme yapılmadı.
-
-**Veritabanını sıfırdan kurmak istiyorum**
-
-```bash
-docker compose down
-docker volume rm hava-kalitesi-izleme_timescale_data
-docker compose up -d
-```
-
-`timescaledb/init/*.sql` script'leri **yalnızca boş volume'da** çalışır. Şemada değişiklik
-yaptıysan ya volume'u sıfırlaman ya da değişikliği çalışan DB'ye elle uygulaman gerekir.
 
 ## Proje yapısı
 

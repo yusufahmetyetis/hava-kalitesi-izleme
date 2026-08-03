@@ -97,3 +97,18 @@ CREATE TABLE IF NOT EXISTS aqi_anomalies (
 
 SELECT create_hypertable('aqi_window_aggregates', 'window_start', if_not_exists => TRUE);
 SELECT create_hypertable('aqi_anomalies', 'detected_at', if_not_exists => TRUE);
+
+-- aqi_anomalies (station_id, measured_at): backend'in anomali EXISTS sorgularini (latest/history/
+-- calendar, bkz. services/stations.py + readings.py) ve AnomalySink'in idempotent insert'ini
+-- (WHERE NOT EXISTS) hizlandirir. NON-UNIQUE: aqi_anomalies detected_at ile partitionlanmis bir
+-- hypertable; TimescaleDB unique index'in partition kolonunu (detected_at) icermesini sart kosar,
+-- ama tekillik measured_at bazinda gerekir -> unique index ise yaramaz. Tekillik bunun yerine
+-- Flink dedup operatoru + idempotent insert ile saglanir.
+CREATE INDEX IF NOT EXISTS aqi_anomalies_station_measured_idx
+    ON aqi_anomalies (station_id, measured_at);
+
+-- filtered_readings (yalnizca backfill z-score anomalilerini tutar): takvim/history'nin iki-kaynakli
+-- anomali birlesimi (bkz. services/stations.py _anomaly_exists_subquery) buraya da EXISTS atiyor.
+-- Partial index (WHERE is_anomaly) sadece anomali satirlarini tutar -> sorgu icin tam ortusme.
+CREATE INDEX IF NOT EXISTS filtered_readings_station_measured_anom_idx
+    ON filtered_readings (station_id, measured_at) WHERE is_anomaly;
