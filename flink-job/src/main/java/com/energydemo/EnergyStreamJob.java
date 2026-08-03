@@ -30,8 +30,8 @@ public class EnergyStreamJob {
         String dbHost = getEnv("DB_HOST", "timescaledb");
         String dbPort = getEnv("DB_PORT", "5432");
         String dbName = getEnv("DB_NAME", "energy_demo");
-        String dbUser = getEnv("DB_USER", "yusuf");
-        String dbPassword = getEnv("DB_PASSWORD", "energy123");
+        String dbUser = requireEnv("DB_USER");
+        String dbPassword = requireEnv("DB_PASSWORD");
         String jdbcUrl = String.format("jdbc:postgresql://%s:%s/%s", dbHost, dbPort, dbName);
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -88,5 +88,19 @@ public class EnergyStreamJob {
     private static String getEnv(String key, String defaultValue) {
         String value = System.getenv(key);
         return (value == null || value.isEmpty()) ? defaultValue : value;
+    }
+
+    /**
+     * Sırlar için: varsayılan YOK. Eskiden DB_USER/DB_PASSWORD'ün kod içinde gerçek değerlere
+     * ayarlı fallback'i vardı, yani kimlik bilgileri hem kaynak kodda hem git geçmişinde
+     * duruyordu. Env verilmediğinde sessizce yanlış kimlikle bağlanmaya çalışmak yerine
+     * açıkça patlaması daha güvenli — yanlış yapılandırma deploy anında görünür olur.
+     */
+    private static String requireEnv(String key) {
+        String value = System.getenv(key);
+        if (value == null || value.isEmpty()) {
+            throw new IllegalStateException(key + " environment variable is required (no default)");
+        }
+        return value;
     }
 }
