@@ -29,6 +29,11 @@ const LAYERS = [
     label: "İstasyon + Model Isı Haritası (Füzyon)",
     info: "21 istasyonun gerçek ölçümü (yüksek ağırlık) ile Marmara'daki CAMS model ızgarasının (düşük ağırlık, ~11 km) IDW ile birleştirilmiş yüzeyi. İstasyona yakınken ölçüm baskın, istasyonsuz bölgelerde model boşluğu doldurur. Sadece Marmara Bölgesi'nde gösterilir.",
   },
+  {
+    key: "aod",
+    label: "Uydu AOD (PM2.5 vekili)",
+    info: "NASA GIBS — MODIS Combined Value Added Aerosol Optical Depth. Uydudan aerosol optik derinliği; PM2.5 için dolaylı ama bilimsel bir vekildir. Günlük, ~2 km çözünürlük, ~1 gün gecikmeli. Yalnızca 2D görünümde etkili. Bulutlu bölgelerde boşluk normaldir. Kaynak: NASA EOSDIS GIBS.",
+  },
 ];
 
 export default function MapControlWidget() {

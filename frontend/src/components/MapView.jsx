@@ -7,6 +7,7 @@ import DistrictLayer from "./DistrictLayer.jsx";
 import WindLayer from "./WindLayer.jsx";
 import HexbinLayer from "./HexbinLayer.jsx";
 import CamsHeatmapLayer from "./CamsHeatmapLayer.jsx";
+import AodLayer from "./AodLayer.jsx";
 import { useMapStore } from "../store/mapStore.js";
 import { leafletToViewState, viewStateToLeaflet, TURKEY_BOUNDS } from "../lib/geoUtils.js";
 import { normalizeStation } from "../lib/stationUtils.js";
@@ -67,6 +68,10 @@ export default function MapView({ readings, onSelect, selected }) {
         subdomains="abcd"
         maxZoom={19}
       />
+
+      {/* Uydu AOD karo katmanı: taban haritanın üstünde ama vektör/canvas katmanlarının
+          ve marker'ların altında kalır (Leaflet tilePane, overlay/marker pane'lerinin altında). */}
+      {layers.aod && <AodLayer />}
 
       {layers.districts && <DistrictLayer readings={readings} />}
       {layers.heatmap && <HeatLayer readings={readings} />}
