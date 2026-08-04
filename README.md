@@ -1,5 +1,24 @@
 # Hava Kalitesi İzleme Sistemi
 
+> ## ⚠️ Bu depo arşivlenmiştir — geliştirme burada sürmüyor
+>
+> Proje `outdoor-airq` adıyla, bileşenler farklı deploy ritimlerine sahip olduğu için
+> **dört ayrı depoya** ayrılmıştır. Bu depo yalnızca tarihsel referans olarak durmaktadır;
+> buraya yeni commit atılmamalıdır.
+>
+> | Yeni depo | İçerik |
+> |---|---|
+> | [outdoor-airq-core](https://github.com/outdoor-airq/outdoor-airq-core) | Backend (FastAPI), Flink stream job'ları, MQTT publisher, paylaşılan modeller, DB şeması |
+> | [outdoor-airq-frontend](https://github.com/outdoor-airq/outdoor-airq-frontend) | React + Leaflet/deck.gl dashboard |
+> | [outdoor-airq-synthetic-data](https://github.com/outdoor-airq/outdoor-airq-synthetic-data) | TÜİK verisinden sentetik hane popülasyonu üretimi |
+> | [outdoor-airq-infra](https://github.com/outdoor-airq/outdoor-airq-infra) | Prod compose, GHCR imaj pinleri, deploy workflow |
+>
+> Organizasyon: **[github.com/outdoor-airq](https://github.com/outdoor-airq)**
+>
+> **Not:** Yeni depoların git geçmişi `git filter-repo` ile yeniden yazılmıştır; bu depoyla
+> ortak commit'leri yoktur. Bu yüzden buradan yeni depolara push/pull yapılamaz — çalışmalar
+> doğrudan ilgili yeni depoda yürütülmelidir.
+
 İstanbul hava kalitesi istasyonlarının verisini toplayıp harita tabanlı bir dashboard'da gösteren
 gerçek zamanlı veri hattı.
 
